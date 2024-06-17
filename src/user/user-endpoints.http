@@ -1,0 +1,42 @@
+GET http://localhost:3000/user
+
+###
+
+GET http://localhost:3000/user/691c822d-e803-42b9-862f-c427da696a3a
+
+###
+
+POST http://localhost:3000/user
+Content-Type: application/json
+
+{
+  "name": "Test Post",
+  "email": "test@post.com",
+  "password": "@Post1234"
+}
+
+###
+
+PUT http://localhost:3000/user/89dea903-4170-40e6-987f-7139c5052743
+Content-Type: application/json
+
+{
+  "name": "Test Put",
+  "email": "test@put.com",
+  "password": "@Put1234"
+}
+
+###
+
+PATCH http://localhost:3000/user/89dea903-4170-40e6-987f-7139c5052743
+Content-Type: application/json
+
+{
+  "name": "Test Patch",
+  "email": "test@patch.com",
+  "password": "@Patch1234"
+}
+
+###
+
+DELETE http://localhost:3000/user/89dea903-4170-40e6-987f-7139c5052743
