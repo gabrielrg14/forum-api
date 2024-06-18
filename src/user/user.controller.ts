@@ -11,9 +11,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User as UserModel } from '@prisma/client';
-import { CreateUserDTO } from './dto/create-user.dto';
-import { UpdateUserDTO } from './dto/update-user.dto';
-import { UpdateUserPasswordDTO } from './dto/update-user-password.dto';
+import { CreateUserDTO, UpdateUserDTO, UpdateUserPasswordDTO } from './dto';
 
 @Controller('user')
 export class UserController {
@@ -66,7 +64,7 @@ export class UserController {
     ): Promise<UserModel> {
         const userUpdated = await this.userService.updateUserPassword({
             where: { id: userId },
-            password: userPasswordData.password,
+            data: userPasswordData,
         });
 
         if (!userUpdated)
