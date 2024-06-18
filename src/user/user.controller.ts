@@ -13,24 +13,11 @@ import { UserService } from './user.service';
 import { User as UserModel } from '@prisma/client';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { UpdateUserDTO } from './dto/update-user.dto';
+import { UpdateUserPasswordDTO } from './dto/update-user-password.dto';
 
 @Controller('user')
 export class UserController {
     constructor(private userService: UserService) {}
-
-    async updateUser(
-        userId: string,
-        userData: UpdateUserDTO,
-    ): Promise<UserModel> {
-        const userUpdated = await this.userService.updateUser({
-            where: { id: userId },
-            data: userData,
-        });
-
-        if (!userUpdated)
-            throw new NotFoundException('User has not been updated.');
-        return userUpdated;
-    }
 
     @Get()
     async getUsers(): Promise<UserModel[]> {
@@ -58,19 +45,35 @@ export class UserController {
     }
 
     @Put('/:id')
-    async putUser(
+    async updateUser(
         @Param('id') userId: string,
         @Body() userData: UpdateUserDTO,
     ): Promise<UserModel> {
-        return this.updateUser(userId, userData);
+        const userUpdated = await this.userService.updateUser({
+            where: { id: userId },
+            data: userData,
+        });
+
+        if (!userUpdated)
+            throw new NotFoundException('User has not been updated.');
+        return userUpdated;
     }
 
-    @Patch('/:id')
-    async patchUser(
+    @Patch('/:id/password')
+    async updateUserPassword(
         @Param('id') userId: string,
-        @Body() userData: UpdateUserDTO,
+        @Body() userPasswordData: UpdateUserPasswordDTO,
     ): Promise<UserModel> {
-        return this.updateUser(userId, userData);
+        const userUpdated = await this.userService.updateUserPassword({
+            where: { id: userId },
+            password: userPasswordData.password,
+        });
+
+        if (!userUpdated)
+            throw new NotFoundException(
+                'The user password has not been updated.',
+            );
+        return userUpdated;
     }
 
     @Delete('/:id')

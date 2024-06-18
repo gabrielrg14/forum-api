@@ -2,10 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { UserRepository } from './user.repository';
 import { Prisma, User } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService implements UserRepository {
     constructor(private prisma: PrismaService) {}
+
+    private readonly hashSalt = 10;
 
     getUser(
         userWhereUniqueInput: Prisma.UserWhereUniqueInput,
@@ -21,8 +24,11 @@ export class UserService implements UserRepository {
         return this.prisma.user.findMany({ where, orderBy });
     }
 
-    createUser(data: Prisma.UserCreateInput): Promise<User> {
-        return this.prisma.user.create({ data });
+    async createUser(data: Prisma.UserCreateInput): Promise<User> {
+        const passwordHash = await bcrypt.hash(data.password, this.hashSalt);
+        return this.prisma.user.create({
+            data: { ...data, password: passwordHash },
+        });
     }
 
     updateUser(params: {
@@ -31,6 +37,18 @@ export class UserService implements UserRepository {
     }): Promise<User> {
         const { where, data } = params;
         return this.prisma.user.update({ where, data });
+    }
+
+    async updateUserPassword(params: {
+        where: Prisma.UserWhereUniqueInput;
+        password: string;
+    }): Promise<User> {
+        const { where, password } = params;
+        const passwordHash = await bcrypt.hash(password, this.hashSalt);
+        return this.prisma.user.update({
+            where,
+            data: { password: passwordHash },
+        });
     }
 
     deleteUser(where: Prisma.UserWhereUniqueInput): Promise<User> {

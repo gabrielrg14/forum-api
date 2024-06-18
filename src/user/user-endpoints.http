@@ -2,7 +2,7 @@ GET http://localhost:3000/user
 
 ###
 
-GET http://localhost:3000/user/691c822d-e803-42b9-862f-c427da696a3a
+GET http://localhost:3000/user/57d964c5-e358-48d8-93a2-098d8d410f05
 
 ###
 
@@ -11,32 +11,29 @@ Content-Type: application/json
 
 {
   "name": "Test Post",
-  "email": "test@post.com",
+  "email": "test2@post.com",
   "password": "@Post1234"
 }
 
 ###
 
-PUT http://localhost:3000/user/89dea903-4170-40e6-987f-7139c5052743
+PUT http://localhost:3000/user/57d964c5-e358-48d8-93a2-098d8d410f05
 Content-Type: application/json
 
 {
   "name": "Test Put",
-  "email": "test@put.com",
-  "password": "@Put1234"
+  "email": "test@put.com"
 }
 
 ###
 
-PATCH http://localhost:3000/user/89dea903-4170-40e6-987f-7139c5052743
+PATCH http://localhost:3000/user/57d964c5-e358-48d8-93a2-098d8d410f05/password
 Content-Type: application/json
 
 {
-  "name": "Test Patch",
-  "email": "test@patch.com",
   "password": "@Patch1234"
 }
 
 ###
 
-DELETE http://localhost:3000/user/89dea903-4170-40e6-987f-7139c5052743
+DELETE http://localhost:3000/user/57d964c5-e358-48d8-93a2-098d8d410f05
