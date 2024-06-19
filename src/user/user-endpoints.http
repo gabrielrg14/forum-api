@@ -6,12 +6,12 @@ GET http://localhost:3000/user/57d964c5-e358-48d8-93a2-098d8d410f05
 
 ###
 
-POST http://localhost:3000/user
+POST http://localhost:3000/user/signup
 Content-Type: application/json
 
 {
   "name": "Test Post",
-  "email": "test2@post.com",
+  "email": "test@post.com",
   "password": "@Post1234"
 }
 

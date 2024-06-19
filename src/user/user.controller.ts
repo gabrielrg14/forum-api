@@ -1,6 +1,5 @@
 import {
     Controller,
-    NotFoundException,
     Param,
     Body,
     Get,
@@ -18,67 +17,44 @@ export class UserController {
     constructor(private userService: UserService) {}
 
     @Get()
-    async getUsers(): Promise<UserModel[]> {
-        const getUsers = await this.userService.getUsers({});
-
-        if (!getUsers) throw new NotFoundException('Users not found.');
-        return getUsers;
+    getUsers(): Promise<UserModel[]> {
+        return this.userService.getUsers({});
     }
 
     @Get('/:id')
-    async getUserById(@Param('id') userId: string): Promise<UserModel> {
-        const getUser = await this.userService.getUser({ id: userId });
-
-        if (!getUser) throw new NotFoundException('User not found.');
-        return getUser;
+    getUserById(@Param('id') userId: string): Promise<UserModel> {
+        return this.userService.getUser({ id: userId });
     }
 
-    @Post()
-    async signupUser(@Body() userData: CreateUserDTO): Promise<UserModel> {
-        const userCreated = await this.userService.createUser(userData);
-
-        if (!userCreated)
-            throw new NotFoundException('User has not been created.');
-        return userCreated;
+    @Post('/signup')
+    signupUser(@Body() userData: CreateUserDTO): Promise<UserModel> {
+        return this.userService.createUser(userData);
     }
 
     @Put('/:id')
-    async updateUser(
+    updateUser(
         @Param('id') userId: string,
         @Body() userData: UpdateUserDTO,
     ): Promise<UserModel> {
-        const userUpdated = await this.userService.updateUser({
+        return this.userService.updateUser({
             where: { id: userId },
             data: userData,
         });
-
-        if (!userUpdated)
-            throw new NotFoundException('User has not been updated.');
-        return userUpdated;
     }
 
     @Patch('/:id/password')
-    async updateUserPassword(
+    updateUserPassword(
         @Param('id') userId: string,
         @Body() userPasswordData: UpdateUserPasswordDTO,
     ): Promise<UserModel> {
-        const userUpdated = await this.userService.updateUserPassword({
+        return this.userService.updateUserPassword({
             where: { id: userId },
             data: userPasswordData,
         });
-
-        if (!userUpdated)
-            throw new NotFoundException(
-                'The user password has not been updated.',
-            );
-        return userUpdated;
     }
 
     @Delete('/:id')
-    async deleteUser(@Param('id') userId: string): Promise<void> {
-        const userDeleted = await this.userService.deleteUser({ id: userId });
-
-        if (!userDeleted)
-            throw new NotFoundException('The user has not been deleted');
+    deleteUser(@Param('id') userId: string): Promise<void> {
+        return this.userService.deleteUser({ id: userId });
     }
 }
