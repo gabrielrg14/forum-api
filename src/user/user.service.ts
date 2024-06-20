@@ -55,7 +55,10 @@ export class UserService implements UserRepository {
     }
 
     async createUser(data: CreateUserDTO): Promise<UserDTO> {
-        const passwordHash = await bcrypt.hash(data.password, this.hashSalt);
+        const passwordHash = await bcrypt.hashSync(
+            data.password,
+            this.hashSalt,
+        );
 
         const userCreated = await this.prisma.user.create({
             data: { ...data, password: passwordHash },
@@ -94,7 +97,11 @@ export class UserService implements UserRepository {
     }): Promise<UserDTO> {
         const { where, data } = params;
 
-        const passwordHash = await bcrypt.hash(data.password, this.hashSalt);
+        const passwordHash = await bcrypt.hashSync(
+            data.password,
+            this.hashSalt,
+        );
+
         const userUpdated = await this.prisma.user.update({
             where,
             data: { password: passwordHash },
