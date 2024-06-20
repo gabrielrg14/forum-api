@@ -1,22 +1,20 @@
 import {
     Injectable,
-    Inject,
     NotFoundException,
     UnauthorizedException,
 } from '@nestjs/common';
-import { UserService } from 'src/user/user.service';
+import { PrismaService } from 'src/database/prisma.service';
 import { AuthDTO } from './dto';
-import { User } from '@prisma/client';
+import { UserDTO } from 'src/user/dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-    @Inject()
-    private readonly userService: UserService;
+    constructor(private prisma: PrismaService) {}
 
-    async signin(authData: AuthDTO): Promise<Omit<User, 'password'>> {
-        const user = await this.userService.getUser({
-            email: authData.email,
+    async signin(authData: AuthDTO): Promise<UserDTO> {
+        const user = await this.prisma.user.findUnique({
+            where: { email: authData.email },
         });
         if (!user) throw new NotFoundException('User not found.');
 

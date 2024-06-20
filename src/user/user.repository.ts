@@ -1,27 +1,32 @@
-import { Prisma, User } from '@prisma/client';
-import { CreateUserDTO, UpdateUserDTO, UpdateUserPasswordDTO } from './dto';
+import { Prisma } from '@prisma/client';
+import {
+    UserDTO,
+    CreateUserDTO,
+    UpdateUserDTO,
+    UpdateUserPasswordDTO,
+} from './dto';
 
 export abstract class UserRepository {
     abstract getUser(
         userWhereUniqueInput: Prisma.UserWhereUniqueInput,
-    ): Promise<User>;
+    ): Promise<UserDTO>;
 
     abstract getUsers(params: {
         where?: Prisma.UserWhereInput;
         orderBy?: Prisma.UserOrderByWithRelationInput;
-    }): Promise<User[]>;
+    }): Promise<UserDTO[]>;
 
-    abstract createUser(data: CreateUserDTO): Promise<User>;
+    abstract createUser(data: CreateUserDTO): Promise<UserDTO>;
 
     abstract updateUser(params: {
         where: Prisma.UserWhereUniqueInput;
         data: UpdateUserDTO;
-    }): Promise<User>;
+    }): Promise<UserDTO>;
 
     abstract updateUserPassword(params: {
         where: Prisma.UserWhereUniqueInput;
         data: UpdateUserPasswordDTO;
-    }): Promise<User>;
+    }): Promise<UserDTO>;
 
     abstract deleteUser(where: Prisma.UserWhereUniqueInput): Promise<void>;
 }

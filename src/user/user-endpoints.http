@@ -27,7 +27,7 @@ Content-Type: application/json
 
 ###
 
-PATCH http://localhost:3000/user/57d964c5-e358-48d8-93a2-098d8d410f05/password
+PATCH http://localhost:3000/user/password/57d964c5-e358-48d8-93a2-098d8d410f05
 Content-Type: application/json
 
 {

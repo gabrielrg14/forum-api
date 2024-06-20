@@ -5,23 +5,39 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { UserRepository } from './user.repository';
-import { Prisma, User } from '@prisma/client';
-import { CreateUserDTO, UpdateUserDTO, UpdateUserPasswordDTO } from './dto';
+import { Prisma } from '@prisma/client';
+import {
+    UserDTO,
+    CreateUserDTO,
+    UpdateUserDTO,
+    UpdateUserPasswordDTO,
+} from './dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService implements UserRepository {
     constructor(private prisma: PrismaService) {}
 
+    private readonly userSelect = {
+        id: true,
+        email: true,
+        name: true,
+        createdAt: true,
+        updatedAt: true,
+    };
     private readonly hashSalt = 10;
 
     async getUsers(params: {
         where?: Prisma.UserWhereInput;
         orderBy?: Prisma.UserOrderByWithRelationInput;
-    }): Promise<User[]> {
+    }): Promise<UserDTO[]> {
         const { where, orderBy } = params;
 
-        const users = await this.prisma.user.findMany({ where, orderBy });
+        const users = await this.prisma.user.findMany({
+            where,
+            orderBy,
+            select: this.userSelect,
+        });
         if (!users) throw new NotFoundException('Users not found.');
 
         return users;
@@ -29,19 +45,21 @@ export class UserService implements UserRepository {
 
     async getUser(
         userWhereUniqueInput: Prisma.UserWhereUniqueInput,
-    ): Promise<User> {
+    ): Promise<UserDTO> {
         const user = await this.prisma.user.findUnique({
             where: userWhereUniqueInput,
+            select: this.userSelect,
         });
         if (!user) throw new NotFoundException('User not found.');
         return user;
     }
 
-    async createUser(data: CreateUserDTO): Promise<User> {
+    async createUser(data: CreateUserDTO): Promise<UserDTO> {
         const passwordHash = await bcrypt.hash(data.password, this.hashSalt);
 
         const userCreated = await this.prisma.user.create({
             data: { ...data, password: passwordHash },
+            select: this.userSelect,
         });
         if (!userCreated)
             throw new BadRequestException(
@@ -54,10 +72,14 @@ export class UserService implements UserRepository {
     async updateUser(params: {
         where: Prisma.UserWhereUniqueInput;
         data: UpdateUserDTO;
-    }): Promise<User> {
+    }): Promise<UserDTO> {
         const { where, data } = params;
 
-        const userUpdated = await this.prisma.user.update({ where, data });
+        const userUpdated = await this.prisma.user.update({
+            where,
+            data,
+            select: this.userSelect,
+        });
         if (!userUpdated)
             throw new BadRequestException(
                 'Something bad happened and the user was not updated.',
@@ -69,13 +91,14 @@ export class UserService implements UserRepository {
     async updateUserPassword(params: {
         where: Prisma.UserWhereUniqueInput;
         data: UpdateUserPasswordDTO;
-    }): Promise<User> {
+    }): Promise<UserDTO> {
         const { where, data } = params;
 
         const passwordHash = await bcrypt.hash(data.password, this.hashSalt);
         const userUpdated = await this.prisma.user.update({
             where,
             data: { password: passwordHash },
+            select: this.userSelect,
         });
         if (!userUpdated)
             throw new BadRequestException(
