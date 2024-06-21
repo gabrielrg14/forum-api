@@ -1,8 +1,10 @@
 GET http://localhost:3000/user
+Authorization: Bearer {{$dotenv AUTH_TOKEN}}
 
 ###
 
 GET http://localhost:3000/user/57d964c5-e358-48d8-93a2-098d8d410f05
+Authorization: Bearer {{$dotenv AUTH_TOKEN}}
 
 ###
 
@@ -18,6 +20,7 @@ Content-Type: application/json
 ###
 
 PUT http://localhost:3000/user/57d964c5-e358-48d8-93a2-098d8d410f05
+Authorization: Bearer {{$dotenv AUTH_TOKEN}}
 Content-Type: application/json
 
 {
@@ -28,6 +31,7 @@ Content-Type: application/json
 ###
 
 PATCH http://localhost:3000/user/password/57d964c5-e358-48d8-93a2-098d8d410f05
+Authorization: Bearer {{$dotenv AUTH_TOKEN}}
 Content-Type: application/json
 
 {
@@ -37,3 +41,4 @@ Content-Type: application/json
 ###
 
 DELETE http://localhost:3000/user/57d964c5-e358-48d8-93a2-098d8d410f05
+Authorization: Bearer {{$dotenv AUTH_TOKEN}}

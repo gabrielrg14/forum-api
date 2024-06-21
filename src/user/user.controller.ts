@@ -1,5 +1,6 @@
 import {
     Controller,
+    UseGuards,
     Param,
     Body,
     Get,
@@ -9,6 +10,7 @@ import {
     Delete,
 } from '@nestjs/common';
 import { UserService } from './user.service';
+import { AuthGuard } from 'src/auth/auth.guard';
 import {
     UserDTO,
     CreateUserDTO,
@@ -21,11 +23,13 @@ export class UserController {
     constructor(private userService: UserService) {}
 
     @Get()
+    @UseGuards(AuthGuard)
     getUsers(): Promise<UserDTO[]> {
         return this.userService.getUsers({});
     }
 
     @Get('/:id')
+    @UseGuards(AuthGuard)
     getUserById(@Param('id') userId: string): Promise<UserDTO> {
         return this.userService.getUser({ id: userId });
     }
@@ -36,6 +40,7 @@ export class UserController {
     }
 
     @Put('/:id')
+    @UseGuards(AuthGuard)
     updateUser(
         @Param('id') userId: string,
         @Body() userData: UpdateUserDTO,
@@ -47,6 +52,7 @@ export class UserController {
     }
 
     @Patch('/password/:id')
+    @UseGuards(AuthGuard)
     updateUserPassword(
         @Param('id') userId: string,
         @Body() userPasswordData: UpdateUserPasswordDTO,
@@ -58,6 +64,7 @@ export class UserController {
     }
 
     @Delete('/:id')
+    @UseGuards(AuthGuard)
     deleteUser(@Param('id') userId: string): Promise<void> {
         return this.userService.deleteUser({ id: userId });
     }
