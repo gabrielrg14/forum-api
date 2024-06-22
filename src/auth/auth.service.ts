@@ -3,19 +3,20 @@ import {
     NotFoundException,
     UnauthorizedException,
 } from '@nestjs/common';
+import { AuthRepository } from './auth.repository';
 import { PrismaService } from 'src/database/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { AuthDTO, AuthTokenDTO } from './dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
-export class AuthService {
+export class AuthService implements AuthRepository {
     constructor(
         private prisma: PrismaService,
         private jwtService: JwtService,
     ) {}
 
-    async signin(authData: AuthDTO): Promise<AuthTokenDTO> {
+    async signIn(authData: AuthDTO): Promise<AuthTokenDTO> {
         const { email, password } = authData;
 
         const user = await this.prisma.user.findUnique({

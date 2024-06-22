@@ -22,21 +22,21 @@ import {
 export class UserController {
     constructor(private userService: UserService) {}
 
+    @Post('/signup')
+    signUpUser(@Body() userData: CreateUserDTO): Promise<UserDTO> {
+        return this.userService.createUser(userData);
+    }
+
     @Get()
     @UseGuards(AuthGuard)
-    getUsers(): Promise<UserDTO[]> {
+    getAllUsers(): Promise<UserDTO[]> {
         return this.userService.getUsers({});
     }
 
     @Get('/:id')
     @UseGuards(AuthGuard)
-    getUserById(@Param('id') userId: string): Promise<UserDTO> {
+    getOneUser(@Param('id') userId: string): Promise<UserDTO> {
         return this.userService.getUser({ id: userId });
-    }
-
-    @Post('/signup')
-    signupUser(@Body() userData: CreateUserDTO): Promise<UserDTO> {
-        return this.userService.createUser(userData);
     }
 
     @Put('/:id')

@@ -3,8 +3,8 @@ import {
     NotFoundException,
     BadRequestException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
 import { UserRepository } from './user.repository';
+import { PrismaService } from 'src/database/prisma.service';
 import { Prisma } from '@prisma/client';
 import {
     UserDTO,
