@@ -27,33 +27,6 @@ export class UserService implements UserRepository {
     };
     private readonly hashSalt = 10;
 
-    async getUsers(params: {
-        where?: Prisma.UserWhereInput;
-        orderBy?: Prisma.UserOrderByWithRelationInput;
-    }): Promise<UserDTO[]> {
-        const { where, orderBy } = params;
-
-        const users = await this.prisma.user.findMany({
-            where,
-            orderBy,
-            select: this.userSelect,
-        });
-        if (!users) throw new NotFoundException('Users not found.');
-
-        return users;
-    }
-
-    async getUser(
-        userWhereUniqueInput: Prisma.UserWhereUniqueInput,
-    ): Promise<UserDTO> {
-        const user = await this.prisma.user.findUnique({
-            where: userWhereUniqueInput,
-            select: this.userSelect,
-        });
-        if (!user) throw new NotFoundException('User not found.');
-        return user;
-    }
-
     async createUser(data: CreateUserDTO): Promise<UserDTO> {
         const passwordHash = await bcrypt.hashSync(
             data.password,
@@ -70,6 +43,31 @@ export class UserService implements UserRepository {
             );
 
         return userCreated;
+    }
+
+    async getUsers(params: {
+        where?: Prisma.UserWhereInput;
+        orderBy?: Prisma.UserOrderByWithRelationInput;
+    }): Promise<UserDTO[]> {
+        const { where, orderBy } = params;
+
+        const users = await this.prisma.user.findMany({
+            where,
+            orderBy,
+            select: this.userSelect,
+        });
+        if (!users) throw new NotFoundException('Users not found.');
+
+        return users;
+    }
+
+    async getUser(where: Prisma.UserWhereUniqueInput): Promise<UserDTO> {
+        const user = await this.prisma.user.findUnique({
+            where,
+            select: this.userSelect,
+        });
+        if (!user) throw new NotFoundException('User not found.');
+        return user;
     }
 
     async updateUser(params: {
