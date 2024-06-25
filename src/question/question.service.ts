@@ -12,8 +12,13 @@ import { Prisma } from '@prisma/client';
 export class QuestionService implements QuestionRepository {
     constructor(private readonly prisma: PrismaService) {}
 
-    async createQuestion(data: CreateQuestionDto): Promise<QuestionDTO> {
-        const questionCreated = await this.prisma.questions.create({ data });
+    async createQuestion(
+        data: CreateQuestionDto,
+        userId: string,
+    ): Promise<QuestionDTO> {
+        const questionCreated = await this.prisma.questions.create({
+            data: { ...data, userId },
+        });
         if (!questionCreated)
             throw new BadRequestException(
                 'Something bad happened and the question was not created.',

@@ -2,7 +2,10 @@ import { Prisma } from '@prisma/client';
 import { QuestionDTO, CreateQuestionDto, UpdateQuestionDto } from './dto';
 
 export abstract class QuestionRepository {
-    abstract createQuestion(data: CreateQuestionDto): Promise<QuestionDTO>;
+    abstract createQuestion(
+        data: CreateQuestionDto,
+        userId: string,
+    ): Promise<QuestionDTO>;
 
     abstract getQuestions(params: {
         where?: Prisma.QuestionsWhereUniqueInput;
