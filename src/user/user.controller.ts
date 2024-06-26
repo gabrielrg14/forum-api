@@ -28,13 +28,11 @@ export class UserController {
     }
 
     @Get()
-    @UseGuards(AuthGuard)
     getAllUsers(): Promise<UserDTO[]> {
         return this.userService.getUsers({});
     }
 
     @Get('/:id')
-    @UseGuards(AuthGuard)
     getOneUser(@Param('id') userId: string): Promise<UserDTO> {
         return this.userService.getUser({ id: userId });
     }

@@ -3,7 +3,7 @@ import {
     UseGuards,
     Param,
     Body,
-    Req,
+    Request,
     Post,
     Get,
     Put,
@@ -21,7 +21,7 @@ export class QuestionController {
     @UseGuards(AuthGuard)
     createQuestion(
         @Body() createQuestionDto: CreateQuestionDto,
-        @Req() req: any,
+        @Request() req: any,
     ): Promise<QuestionDTO> {
         return this.questionService.createQuestion(createQuestionDto, req.sub);
     }

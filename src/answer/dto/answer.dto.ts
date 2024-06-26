@@ -1,3 +1,10 @@
 import { Answers } from '@prisma/client';
 
-export type AnswerDTO = Answers;
+export class AnswerDTO implements Answers {
+    id: string;
+    body: string;
+    createdAt: Date;
+    updatedAt: Date;
+    userId: string;
+    questionId: string;
+}
