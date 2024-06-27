@@ -20,10 +20,10 @@ export class QuestionController {
     @Post()
     @UseGuards(AuthGuard)
     createQuestion(
-        @Body() createQuestionDto: CreateQuestionDto,
-        @Request() req: any,
+        @Body() questionData: CreateQuestionDto,
+        @Request() req: { token: { sub: string } },
     ): Promise<QuestionDTO> {
-        return this.questionService.createQuestion(createQuestionDto, req.sub);
+        return this.questionService.createQuestion(questionData, req.token.sub);
     }
 
     @Get()

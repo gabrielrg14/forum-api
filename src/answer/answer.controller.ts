@@ -20,11 +20,15 @@ export class AnswerController {
     @Post('/question/:id')
     @UseGuards(AuthGuard)
     createAnswer(
-        @Body() data: CreateAnswerDto,
-        @Request() req: any,
+        @Body() answerData: CreateAnswerDto,
+        @Request() req: { token: { sub: string } },
         @Param('id') questionId: string,
     ): Promise<AnswerDTO> {
-        return this.answerService.createAnswer(data, req.sub, questionId);
+        return this.answerService.createAnswer(
+            answerData,
+            req.token.sub,
+            questionId,
+        );
     }
 
     @Get()
@@ -41,11 +45,11 @@ export class AnswerController {
     @UseGuards(AuthGuard)
     updateAnswer(
         @Param('id') answerId: string,
-        @Body() data: UpdateAnswerDto,
+        @Body() answerData: UpdateAnswerDto,
     ): Promise<AnswerDTO> {
         return this.answerService.updateAnswer({
             where: { id: answerId },
-            data,
+            data: answerData,
         });
     }
 
