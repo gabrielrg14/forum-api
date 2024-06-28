@@ -1,0 +1,32 @@
+POST http://localhost:3000/question
+Authorization: Bearer {{$dotenv AUTH_TOKEN}}
+Content-Type: application/json
+
+{
+    "title": "Post Question",
+    "body": "Post Body"
+}
+
+###
+
+GET http://localhost:3000/question
+
+###
+
+GET http://localhost:3000/question/9c147f8d-fae9-45df-bc83-73e81bfce0a5
+
+###
+
+PUT http://localhost:3000/question/9c147f8d-fae9-45df-bc83-73e81bfce0a5
+Authorization: Bearer {{$dotenv AUTH_TOKEN}}
+Content-Type: application/json
+
+{
+    "title": "Put Question",
+    "body": "Put Body"
+}
+
+###
+
+DELETE http://localhost:3000/question/9c147f8d-fae9-45df-bc83-73e81bfce0a5
+Authorization: Bearer {{$dotenv AUTH_TOKEN}}

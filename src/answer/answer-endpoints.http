@@ -1,0 +1,30 @@
+POST http://localhost:3000/answer/question/9c147f8d-fae9-45df-bc83-73e81bfce0a5
+Authorization: Bearer {{$dotenv AUTH_TOKEN}}
+Content-Type: application/json
+
+{
+    "body": "Post Answer"
+}
+
+###
+
+GET http://localhost:3000/answer
+
+###
+
+GET http://localhost:3000/answer/1c3d2ff2-337b-427e-8d35-6b7cd1d4ee0a
+
+###
+
+PUT http://localhost:3000/answer/1c3d2ff2-337b-427e-8d35-6b7cd1d4ee0a
+Authorization: Bearer {{$dotenv AUTH_TOKEN}}
+Content-Type: application/json
+
+{
+    "body": "Put Answer"
+}
+
+###
+
+DELETE http://localhost:3000/answer/1c3d2ff2-337b-427e-8d35-6b7cd1d4ee0a
+Authorization: Bearer {{$dotenv AUTH_TOKEN}}

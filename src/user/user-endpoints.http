@@ -1,11 +1,3 @@
-GET http://localhost:3000/user
-
-###
-
-GET http://localhost:3000/user/57d964c5-e358-48d8-93a2-098d8d410f05
-
-###
-
 POST http://localhost:3000/user/signup
 Content-Type: application/json
 
@@ -14,6 +6,14 @@ Content-Type: application/json
   "email": "test@post.com",
   "password": "@Post1234"
 }
+
+###
+
+GET http://localhost:3000/user
+
+###
+
+GET http://localhost:3000/user/57d964c5-e358-48d8-93a2-098d8d410f05
 
 ###
 
