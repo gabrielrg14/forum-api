@@ -12,12 +12,28 @@ import { Prisma } from '@prisma/client';
 export class QuestionService implements QuestionRepository {
     constructor(private readonly prisma: PrismaService) {}
 
+    private readonly selectQuestion = {
+        id: true,
+        title: true,
+        body: true,
+        createdAt: true,
+        updatedAt: true,
+        user: {
+            select: {
+                id: true,
+                email: true,
+                name: true,
+            },
+        },
+    };
+
     async createQuestion(
         data: CreateQuestionDto,
         userId: string,
     ): Promise<QuestionDTO> {
         const questionCreated = await this.prisma.questions.create({
             data: { ...data, userId },
+            select: this.selectQuestion,
         });
         if (!questionCreated)
             throw new BadRequestException(
@@ -35,6 +51,7 @@ export class QuestionService implements QuestionRepository {
         const questions = await this.prisma.questions.findMany({
             where,
             orderBy,
+            select: this.selectQuestion,
         });
         if (!questions) throw new NotFoundException('Questions not found.');
 
@@ -44,7 +61,10 @@ export class QuestionService implements QuestionRepository {
     async getQuestion(
         where: Prisma.QuestionsWhereUniqueInput,
     ): Promise<QuestionDTO> {
-        const question = await this.prisma.questions.findUnique({ where });
+        const question = await this.prisma.questions.findUnique({
+            where,
+            select: this.selectQuestion,
+        });
         if (!question) throw new NotFoundException('Question not found.');
         return question;
     }
@@ -57,6 +77,7 @@ export class QuestionService implements QuestionRepository {
         const updatedQuestion = await this.prisma.questions.update({
             where,
             data,
+            select: this.selectQuestion,
         });
         if (!updatedQuestion)
             throw new NotFoundException(

@@ -5,19 +5,20 @@ import {
 } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { PrismaService } from 'src/database/prisma.service';
-import { Prisma } from '@prisma/client';
 import {
     UserDTO,
     CreateUserDTO,
     UpdateUserDTO,
     UpdateUserPasswordDTO,
 } from './dto';
+import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService implements UserRepository {
     constructor(private prisma: PrismaService) {}
 
+    private readonly hashSalt = 10;
     private readonly userSelect = {
         id: true,
         email: true,
@@ -25,7 +26,6 @@ export class UserService implements UserRepository {
         createdAt: true,
         updatedAt: true,
     };
-    private readonly hashSalt = 10;
 
     async createUser(data: CreateUserDTO): Promise<UserDTO> {
         const passwordHash = await bcrypt.hashSync(
