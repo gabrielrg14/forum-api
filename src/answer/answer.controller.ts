@@ -1,6 +1,7 @@
 import {
     Controller,
     UseGuards,
+    ParseUUIDPipe,
     Param,
     Body,
     Request,
@@ -17,12 +18,12 @@ import { AnswerDTO, CreateAnswerDto, UpdateAnswerDto } from './dto';
 export class AnswerController {
     constructor(private readonly answerService: AnswerService) {}
 
-    @Post('/question/:id')
+    @Post('/question/:uuid')
     @UseGuards(AuthGuard)
     createAnswer(
         @Body() answerData: CreateAnswerDto,
         @Request() req: { token: { sub: string } },
-        @Param('id') questionId: string,
+        @Param('uuid', ParseUUIDPipe) questionId: string,
     ): Promise<AnswerDTO> {
         return this.answerService.createAnswer(
             answerData,
@@ -36,15 +37,17 @@ export class AnswerController {
         return this.answerService.getAnswers({});
     }
 
-    @Get('/:id')
-    getOneAnswer(@Param('id') answerId: string): Promise<AnswerDTO> {
+    @Get('/:uuid')
+    getOneAnswer(
+        @Param('uuid', ParseUUIDPipe) answerId: string,
+    ): Promise<AnswerDTO> {
         return this.answerService.getAnswer({ id: answerId });
     }
 
-    @Put('/:id')
+    @Put('/:uuid')
     @UseGuards(AuthGuard)
     updateAnswer(
-        @Param('id') answerId: string,
+        @Param('uuid', ParseUUIDPipe) answerId: string,
         @Body() answerData: UpdateAnswerDto,
     ): Promise<AnswerDTO> {
         return this.answerService.updateAnswer({
@@ -53,9 +56,11 @@ export class AnswerController {
         });
     }
 
-    @Delete('/:id')
+    @Delete('/:uuid')
     @UseGuards(AuthGuard)
-    deleteAnswer(@Param('id') answerId: string): Promise<void> {
+    deleteAnswer(
+        @Param('uuid', ParseUUIDPipe) answerId: string,
+    ): Promise<void> {
         return this.answerService.deleteAnswer({ id: answerId });
     }
 }

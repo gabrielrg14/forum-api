@@ -1,6 +1,7 @@
 import {
     Controller,
     UseGuards,
+    ParseUUIDPipe,
     Param,
     Body,
     Request,
@@ -31,15 +32,17 @@ export class QuestionController {
         return this.questionService.getQuestions({});
     }
 
-    @Get('/:id')
-    getOneQuestion(@Param('id') questionId: string): Promise<QuestionDTO> {
+    @Get('/:uuid')
+    getOneQuestion(
+        @Param('uuid', ParseUUIDPipe) questionId: string,
+    ): Promise<QuestionDTO> {
         return this.questionService.getQuestion({ id: questionId });
     }
 
-    @Put('/:id')
+    @Put('/:uuid')
     @UseGuards(AuthGuard)
     updateQuestion(
-        @Param('id') questionId: string,
+        @Param('uuid', ParseUUIDPipe) questionId: string,
         @Body() questionData: UpdateQuestionDto,
     ): Promise<QuestionDTO> {
         return this.questionService.updateQuestion({
@@ -48,9 +51,11 @@ export class QuestionController {
         });
     }
 
-    @Delete('/:id')
+    @Delete('/:uuid')
     @UseGuards(AuthGuard)
-    deleteQuestion(@Param('id') questionId: string): Promise<void> {
+    deleteQuestion(
+        @Param('uuid', ParseUUIDPipe) questionId: string,
+    ): Promise<void> {
         return this.questionService.deleteQuestion({ id: questionId });
     }
 }

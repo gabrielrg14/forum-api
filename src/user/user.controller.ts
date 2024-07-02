@@ -1,6 +1,7 @@
 import {
     Controller,
     UseGuards,
+    ParseUUIDPipe,
     Param,
     Body,
     Get,
@@ -32,15 +33,15 @@ export class UserController {
         return this.userService.getUsers({});
     }
 
-    @Get('/:id')
-    getOneUser(@Param('id') userId: string): Promise<UserDTO> {
+    @Get('/:uuid')
+    getOneUser(@Param('uuid', ParseUUIDPipe) userId: string): Promise<UserDTO> {
         return this.userService.getUser({ id: userId });
     }
 
-    @Put('/:id')
+    @Put('/:uuid')
     @UseGuards(AuthGuard)
     updateUser(
-        @Param('id') userId: string,
+        @Param('uuid', ParseUUIDPipe) userId: string,
         @Body() userData: UpdateUserDTO,
     ): Promise<UserDTO> {
         return this.userService.updateUser({
@@ -49,10 +50,10 @@ export class UserController {
         });
     }
 
-    @Patch('/password/:id')
+    @Patch('/password/:uuid')
     @UseGuards(AuthGuard)
     updateUserPassword(
-        @Param('id') userId: string,
+        @Param('uuid', ParseUUIDPipe) userId: string,
         @Body() userPasswordData: UpdateUserPasswordDTO,
     ): Promise<UserDTO> {
         return this.userService.updateUserPassword({
@@ -61,9 +62,9 @@ export class UserController {
         });
     }
 
-    @Delete('/:id')
+    @Delete('/:uuid')
     @UseGuards(AuthGuard)
-    deleteUser(@Param('id') userId: string): Promise<void> {
+    deleteUser(@Param('uuid', ParseUUIDPipe) userId: string): Promise<void> {
         return this.userService.deleteUser({ id: userId });
     }
 }
