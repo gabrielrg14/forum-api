@@ -12,7 +12,7 @@ export class AuthService implements AuthRepository {
         private jwtService: JwtService,
     ) {}
 
-    async signIn(authData: AuthDTO): Promise<AuthTokenDTO> {
+    async authUser(authData: AuthDTO): Promise<AuthTokenDTO> {
         const { email, password } = authData;
 
         const user = await this.prisma.user.findUnique({

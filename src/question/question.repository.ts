@@ -8,7 +8,7 @@ export abstract class QuestionRepository {
     ): Promise<QuestionDTO>;
 
     abstract getQuestions(params: {
-        where?: Prisma.QuestionsWhereUniqueInput;
+        where?: Prisma.QuestionsWhereInput;
         orderBy?: Prisma.QuestionsOrderByWithRelationInput;
     }): Promise<QuestionDTO[]>;
 

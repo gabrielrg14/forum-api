@@ -66,7 +66,7 @@ export class AnswerService implements AnswerRepository {
     }
 
     async getAnswers(params: {
-        where?: Prisma.AnswersWhereUniqueInput;
+        where?: Prisma.AnswersWhereInput;
         orderBy?: Prisma.AnswersOrderByWithRelationInput;
     }): Promise<AnswerDTO[]> {
         const { where, orderBy } = params;

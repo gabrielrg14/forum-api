@@ -50,7 +50,7 @@ export class QuestionService implements QuestionRepository {
     }
 
     async getQuestions(params: {
-        where?: Prisma.QuestionsWhereUniqueInput;
+        where?: Prisma.QuestionsWhereInput;
         orderBy?: Prisma.QuestionsOrderByWithRelationInput;
     }): Promise<QuestionDTO[]> {
         const { where, orderBy } = params;

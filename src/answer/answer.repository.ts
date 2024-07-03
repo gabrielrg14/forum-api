@@ -9,7 +9,7 @@ export abstract class AnswerRepository {
     ): Promise<AnswerDTO>;
 
     abstract getAnswers(params: {
-        where?: Prisma.AnswersWhereUniqueInput;
+        where?: Prisma.AnswersWhereInput;
         orderBy?: Prisma.AnswersOrderByWithRelationInput;
     }): Promise<AnswerDTO[]>;
 
