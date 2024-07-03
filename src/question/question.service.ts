@@ -31,6 +31,12 @@ export class QuestionService implements QuestionRepository {
         data: CreateQuestionDto,
         userId: string,
     ): Promise<QuestionDTO> {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+        });
+        if (!user)
+            throw new NotFoundException(`User id ${userId} was not found.`);
+
         const questionCreated = await this.prisma.questions.create({
             data: { ...data, userId },
             select: this.selectQuestion,
@@ -39,6 +45,7 @@ export class QuestionService implements QuestionRepository {
             throw new BadRequestException(
                 'Something bad happened and the question was not created.',
             );
+
         return questionCreated;
     }
 
@@ -53,7 +60,10 @@ export class QuestionService implements QuestionRepository {
             orderBy,
             select: this.selectQuestion,
         });
-        if (!questions) throw new NotFoundException('Questions not found.');
+        if (!questions)
+            throw new BadRequestException(
+                'Something bad happened and the questions was not found.',
+            );
 
         return questions;
     }
@@ -65,7 +75,10 @@ export class QuestionService implements QuestionRepository {
             where,
             select: this.selectQuestion,
         });
-        if (!question) throw new NotFoundException('Question not found.');
+        if (!question)
+            throw new NotFoundException(
+                `Question ${Object.entries(where).map(([key, value]) => `${key} ${value}`)} was not found.`,
+            );
         return question;
     }
 
@@ -74,6 +87,13 @@ export class QuestionService implements QuestionRepository {
         data: UpdateQuestionDto;
     }): Promise<QuestionDTO> {
         const { where, data } = params;
+
+        const question = await this.prisma.questions.findUnique({ where });
+        if (!question)
+            throw new NotFoundException(
+                `Question ${Object.entries(where).map(([key, value]) => `${key} ${value}`)} was not found.`,
+            );
+
         const updatedQuestion = await this.prisma.questions.update({
             where,
             data,
@@ -83,12 +103,19 @@ export class QuestionService implements QuestionRepository {
             throw new NotFoundException(
                 'Something bad happened and the question was not updated.',
             );
+
         return updatedQuestion;
     }
 
     async deleteQuestion(
         where: Prisma.QuestionsWhereUniqueInput,
     ): Promise<void> {
+        const question = await this.prisma.questions.findUnique({ where });
+        if (!question)
+            throw new NotFoundException(
+                `Question ${Object.entries(where).map(([key, value]) => `${key} ${value}`)} was not found.`,
+            );
+
         const questionDeleted = await this.prisma.questions.delete({ where });
         if (!questionDeleted)
             throw new NotFoundException(

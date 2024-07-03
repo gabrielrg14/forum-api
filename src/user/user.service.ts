@@ -28,6 +28,14 @@ export class UserService implements UserRepository {
     };
 
     async createUser(data: CreateUserDTO): Promise<UserDTO> {
+        const { email } = data;
+
+        const user = await this.prisma.user.findUnique({ where: { email } });
+        if (user)
+            throw new BadRequestException(
+                `A user with the email ${email} is already registered.`,
+            );
+
         const passwordHash = await bcrypt.hashSync(
             data.password,
             this.hashSalt,
@@ -56,7 +64,10 @@ export class UserService implements UserRepository {
             orderBy,
             select: this.userSelect,
         });
-        if (!users) throw new NotFoundException('Users not found.');
+        if (!users)
+            throw new BadRequestException(
+                'Something bad happened and the users was not found.',
+            );
 
         return users;
     }
@@ -66,7 +77,10 @@ export class UserService implements UserRepository {
             where,
             select: this.userSelect,
         });
-        if (!user) throw new NotFoundException('User not found.');
+        if (!user)
+            throw new NotFoundException(
+                `User ${Object.entries(where).map(([key, value]) => `${key} ${value}`)} was not found.`,
+            );
         return user;
     }
 
@@ -75,6 +89,12 @@ export class UserService implements UserRepository {
         data: UpdateUserDTO;
     }): Promise<UserDTO> {
         const { where, data } = params;
+
+        const user = await this.prisma.user.findUnique({ where });
+        if (!user)
+            throw new NotFoundException(
+                `User ${Object.entries(where).map(([key, value]) => `${key} ${value}`)} was not found.`,
+            );
 
         const userUpdated = await this.prisma.user.update({
             where,
@@ -95,6 +115,12 @@ export class UserService implements UserRepository {
     }): Promise<UserDTO> {
         const { where, data } = params;
 
+        const user = await this.prisma.user.findUnique({ where });
+        if (!user)
+            throw new NotFoundException(
+                `User ${Object.entries(where).map(([key, value]) => `${key} ${value}`)} was not found.`,
+            );
+
         const passwordHash = await bcrypt.hashSync(
             data.password,
             this.hashSalt,
@@ -114,6 +140,12 @@ export class UserService implements UserRepository {
     }
 
     async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<void> {
+        const user = await this.prisma.user.findUnique({ where });
+        if (!user)
+            throw new NotFoundException(
+                `User ${Object.entries(where).map(([key, value]) => `${key} ${value}`)} was not found.`,
+            );
+
         const userDeleted = await this.prisma.user.delete({ where });
         if (!userDeleted)
             throw new BadRequestException(
