@@ -1,3 +1,4 @@
+# CREATE QUESTION
 POST http://localhost:3000/question
 Authorization: Bearer {{$dotenv AUTH_TOKEN}}
 Content-Type: application/json
@@ -9,14 +10,22 @@ Content-Type: application/json
 
 ###
 
+# GET ALL QUESTIONS
 GET http://localhost:3000/question
 
 ###
 
+# GET USER QUESTIONS
+GET http://localhost:3000/question/user/c3f3d19c-53fe-4968-b00c-11434d21c71c
+
+###
+
+# GET QUESTION BY ID
 GET http://localhost:3000/question/9c147f8d-fae9-45df-bc83-73e81bfce0a5
 
 ###
 
+# UPDATE QUESTION BY ID
 PUT http://localhost:3000/question/9c147f8d-fae9-45df-bc83-73e81bfce0a5
 Authorization: Bearer {{$dotenv AUTH_TOKEN}}
 Content-Type: application/json
@@ -28,5 +37,6 @@ Content-Type: application/json
 
 ###
 
+# DELETE QUESTION BY ID
 DELETE http://localhost:3000/question/9c147f8d-fae9-45df-bc83-73e81bfce0a5
 Authorization: Bearer {{$dotenv AUTH_TOKEN}}

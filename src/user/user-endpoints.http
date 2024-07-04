@@ -1,4 +1,5 @@
-POST http://localhost:3000/user/signup
+# CREATE USER
+POST http://localhost:3000/user
 Content-Type: application/json
 
 {
@@ -9,15 +10,18 @@ Content-Type: application/json
 
 ###
 
+# GET ALL USERS
 GET http://localhost:3000/user
 
 ###
 
-GET http://localhost:3000/user/57d964c5-e358-48d8-93a2-098d8d410f05
+# GET USER BY ID
+GET http://localhost:3000/user/c3f3d19c-53fe-4968-b00c-11434d21c71c
 
 ###
 
-PUT http://localhost:3000/user/57d964c5-e358-48d8-93a2-098d8d410f05
+# UPDATE USER BY ID
+PUT http://localhost:3000/user/c3f3d19c-53fe-4968-b00c-11434d21c71c
 Authorization: Bearer {{$dotenv AUTH_TOKEN}}
 Content-Type: application/json
 
@@ -28,7 +32,8 @@ Content-Type: application/json
 
 ###
 
-PATCH http://localhost:3000/user/password/57d964c5-e358-48d8-93a2-098d8d410f05
+# UPDATE USER PASSWORD BY ID
+PATCH http://localhost:3000/user/c3f3d19c-53fe-4968-b00c-11434d21c71c/password
 Authorization: Bearer {{$dotenv AUTH_TOKEN}}
 Content-Type: application/json
 
@@ -38,5 +43,6 @@ Content-Type: application/json
 
 ###
 
-DELETE http://localhost:3000/user/57d964c5-e358-48d8-93a2-098d8d410f05
+# DELETE USER BY ID
+DELETE http://localhost:3000/user/c3f3d19c-53fe-4968-b00c-11434d21c71c
 Authorization: Bearer {{$dotenv AUTH_TOKEN}}

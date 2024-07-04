@@ -1,3 +1,4 @@
+# CREATE ANSWER
 POST http://localhost:3000/answer/question/9c147f8d-fae9-45df-bc83-73e81bfce0a5
 Authorization: Bearer {{$dotenv AUTH_TOKEN}}
 Content-Type: application/json
@@ -8,14 +9,27 @@ Content-Type: application/json
 
 ###
 
+# GET ALL ANSWERS
 GET http://localhost:3000/answer
 
 ###
 
+# GET QUESTION ANSWERS
+GET http://localhost:3000/answer/question/9c147f8d-fae9-45df-bc83-73e81bfce0a5
+
+###
+
+# GET USER ANSWERS
+GET http://localhost:3000/answer/user/c3f3d19c-53fe-4968-b00c-11434d21c71c
+
+###
+
+# GET ANSWER BY ID
 GET http://localhost:3000/answer/1c3d2ff2-337b-427e-8d35-6b7cd1d4ee0a
 
 ###
 
+# UPDATE ANSWER BY ID
 PUT http://localhost:3000/answer/1c3d2ff2-337b-427e-8d35-6b7cd1d4ee0a
 Authorization: Bearer {{$dotenv AUTH_TOKEN}}
 Content-Type: application/json
@@ -26,5 +40,6 @@ Content-Type: application/json
 
 ###
 
+# DELETE ANSWER BY ID
 DELETE http://localhost:3000/answer/1c3d2ff2-337b-427e-8d35-6b7cd1d4ee0a
 Authorization: Bearer {{$dotenv AUTH_TOKEN}}
