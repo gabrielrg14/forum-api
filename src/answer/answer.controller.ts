@@ -37,8 +37,22 @@ export class AnswerController {
         return this.answerService.getAnswers({});
     }
 
+    @Get('/question/:uuid')
+    getAllQuestionAnswers(
+        @Param('uuid', ParseUUIDPipe) questionId: string,
+    ): Promise<AnswerDTO[]> {
+        return this.answerService.getAnswers({ where: { questionId } });
+    }
+
+    @Get('/user/:uuid')
+    getAllUserAnswers(
+        @Param('uuid', ParseUUIDPipe) userId: string,
+    ): Promise<AnswerDTO[]> {
+        return this.answerService.getAnswers({ where: { userId } });
+    }
+
     @Get('/:uuid')
-    getOneAnswer(
+    getAnswerById(
         @Param('uuid', ParseUUIDPipe) answerId: string,
     ): Promise<AnswerDTO> {
         return this.answerService.getAnswer({ id: answerId });
@@ -46,7 +60,7 @@ export class AnswerController {
 
     @Put('/:uuid')
     @UseGuards(AuthGuard)
-    updateAnswer(
+    updateAnswerById(
         @Param('uuid', ParseUUIDPipe) answerId: string,
         @Body() answerData: UpdateAnswerDto,
     ): Promise<AnswerDTO> {
@@ -58,7 +72,7 @@ export class AnswerController {
 
     @Delete('/:uuid')
     @UseGuards(AuthGuard)
-    deleteAnswer(
+    deleteAnswerById(
         @Param('uuid', ParseUUIDPipe) answerId: string,
     ): Promise<void> {
         return this.answerService.deleteAnswer({ id: answerId });

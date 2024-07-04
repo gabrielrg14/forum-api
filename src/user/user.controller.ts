@@ -23,8 +23,8 @@ import {
 export class UserController {
     constructor(private userService: UserService) {}
 
-    @Post('/signup')
-    signUpUser(@Body() userData: CreateUserDTO): Promise<UserDTO> {
+    @Post()
+    createUser(@Body() userData: CreateUserDTO): Promise<UserDTO> {
         return this.userService.createUser(userData);
     }
 
@@ -34,13 +34,15 @@ export class UserController {
     }
 
     @Get('/:uuid')
-    getOneUser(@Param('uuid', ParseUUIDPipe) userId: string): Promise<UserDTO> {
+    getUserById(
+        @Param('uuid', ParseUUIDPipe) userId: string,
+    ): Promise<UserDTO> {
         return this.userService.getUser({ id: userId });
     }
 
     @Put('/:uuid')
     @UseGuards(AuthGuard)
-    updateUser(
+    updateUserById(
         @Param('uuid', ParseUUIDPipe) userId: string,
         @Body() userData: UpdateUserDTO,
     ): Promise<UserDTO> {
@@ -50,9 +52,9 @@ export class UserController {
         });
     }
 
-    @Patch('/password/:uuid')
+    @Patch('/:uuid/password')
     @UseGuards(AuthGuard)
-    updateUserPassword(
+    updateUserPasswordById(
         @Param('uuid', ParseUUIDPipe) userId: string,
         @Body() userPasswordData: UpdateUserPasswordDTO,
     ): Promise<UserDTO> {
@@ -64,7 +66,9 @@ export class UserController {
 
     @Delete('/:uuid')
     @UseGuards(AuthGuard)
-    deleteUser(@Param('uuid', ParseUUIDPipe) userId: string): Promise<void> {
+    deleteUserById(
+        @Param('uuid', ParseUUIDPipe) userId: string,
+    ): Promise<void> {
         return this.userService.deleteUser({ id: userId });
     }
 }

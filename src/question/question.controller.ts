@@ -32,8 +32,17 @@ export class QuestionController {
         return this.questionService.getQuestions({});
     }
 
+    @Get('/user/:uuid')
+    getAllUserQuestions(
+        @Param('uuid', ParseUUIDPipe) userId: string,
+    ): Promise<QuestionDTO[]> {
+        return this.questionService.getQuestions({
+            where: { userId },
+        });
+    }
+
     @Get('/:uuid')
-    getOneQuestion(
+    getQuestionById(
         @Param('uuid', ParseUUIDPipe) questionId: string,
     ): Promise<QuestionDTO> {
         return this.questionService.getQuestion({ id: questionId });
@@ -41,7 +50,7 @@ export class QuestionController {
 
     @Put('/:uuid')
     @UseGuards(AuthGuard)
-    updateQuestion(
+    updateQuestionById(
         @Param('uuid', ParseUUIDPipe) questionId: string,
         @Body() questionData: UpdateQuestionDto,
     ): Promise<QuestionDTO> {
@@ -53,7 +62,7 @@ export class QuestionController {
 
     @Delete('/:uuid')
     @UseGuards(AuthGuard)
-    deleteQuestion(
+    deleteQuestionById(
         @Param('uuid', ParseUUIDPipe) questionId: string,
     ): Promise<void> {
         return this.questionService.deleteQuestion({ id: questionId });
