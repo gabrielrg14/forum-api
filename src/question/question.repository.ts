@@ -8,20 +8,20 @@ export abstract class QuestionRepository {
     ): Promise<QuestionDTO>;
 
     abstract getQuestions(params: {
-        where?: Prisma.QuestionsWhereInput;
-        orderBy?: Prisma.QuestionsOrderByWithRelationInput;
+        where?: Prisma.QuestionWhereInput;
+        orderBy?: Prisma.QuestionOrderByWithRelationInput;
     }): Promise<QuestionDTO[]>;
 
     abstract getQuestion(
-        where: Prisma.QuestionsWhereUniqueInput,
+        where: Prisma.QuestionWhereUniqueInput,
     ): Promise<QuestionDTO>;
 
     abstract updateQuestion(params: {
-        where: Prisma.QuestionsWhereUniqueInput;
+        where: Prisma.QuestionWhereUniqueInput;
         data: UpdateQuestionDto;
     }): Promise<QuestionDTO>;
 
     abstract deleteQuestion(
-        where: Prisma.QuestionsWhereUniqueInput,
+        where: Prisma.QuestionWhereUniqueInput,
     ): Promise<void>;
 }

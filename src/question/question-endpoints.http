@@ -21,12 +21,12 @@ GET http://localhost:3000/question/user/c3f3d19c-53fe-4968-b00c-11434d21c71c
 ###
 
 # GET QUESTION BY ID
-GET http://localhost:3000/question/9c147f8d-fae9-45df-bc83-73e81bfce0a5
+GET http://localhost:3000/question/50bfc16f-29ce-470a-9e0a-307431480703
 
 ###
 
 # UPDATE QUESTION BY ID
-PUT http://localhost:3000/question/9c147f8d-fae9-45df-bc83-73e81bfce0a5
+PUT http://localhost:3000/question/50bfc16f-29ce-470a-9e0a-307431480703
 Authorization: Bearer {{$dotenv AUTH_TOKEN}}
 Content-Type: application/json
 
@@ -38,5 +38,5 @@ Content-Type: application/json
 ###
 
 # DELETE QUESTION BY ID
-DELETE http://localhost:3000/question/9c147f8d-fae9-45df-bc83-73e81bfce0a5
+DELETE http://localhost:3000/question/50bfc16f-29ce-470a-9e0a-307431480703
 Authorization: Bearer {{$dotenv AUTH_TOKEN}}

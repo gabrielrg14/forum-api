@@ -1,5 +1,5 @@
 # CREATE ANSWER
-POST http://localhost:3000/answer/question/9c147f8d-fae9-45df-bc83-73e81bfce0a5
+POST http://localhost:3000/answer/question/50bfc16f-29ce-470a-9e0a-307431480703
 Authorization: Bearer {{$dotenv AUTH_TOKEN}}
 Content-Type: application/json
 
@@ -15,7 +15,7 @@ GET http://localhost:3000/answer
 ###
 
 # GET QUESTION ANSWERS
-GET http://localhost:3000/answer/question/9c147f8d-fae9-45df-bc83-73e81bfce0a5
+GET http://localhost:3000/answer/question/50bfc16f-29ce-470a-9e0a-307431480703
 
 ###
 
@@ -25,12 +25,12 @@ GET http://localhost:3000/answer/user/c3f3d19c-53fe-4968-b00c-11434d21c71c
 ###
 
 # GET ANSWER BY ID
-GET http://localhost:3000/answer/1c3d2ff2-337b-427e-8d35-6b7cd1d4ee0a
+GET http://localhost:3000/answer/d76c9a94-2772-4dcf-a850-c4e13e1acf1c
 
 ###
 
 # UPDATE ANSWER BY ID
-PUT http://localhost:3000/answer/1c3d2ff2-337b-427e-8d35-6b7cd1d4ee0a
+PUT http://localhost:3000/answer/d76c9a94-2772-4dcf-a850-c4e13e1acf1c
 Authorization: Bearer {{$dotenv AUTH_TOKEN}}
 Content-Type: application/json
 
@@ -41,5 +41,5 @@ Content-Type: application/json
 ###
 
 # DELETE ANSWER BY ID
-DELETE http://localhost:3000/answer/1c3d2ff2-337b-427e-8d35-6b7cd1d4ee0a
+DELETE http://localhost:3000/answer/d76c9a94-2772-4dcf-a850-c4e13e1acf1c
 Authorization: Bearer {{$dotenv AUTH_TOKEN}}

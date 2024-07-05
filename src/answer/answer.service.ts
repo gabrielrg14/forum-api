@@ -45,7 +45,7 @@ export class AnswerService implements AnswerRepository {
         if (!user)
             throw new NotFoundException(`User id ${userId} was not found.`);
 
-        const question = await this.prisma.questions.findUnique({
+        const question = await this.prisma.question.findUnique({
             where: { id: questionId },
         });
         if (!question)
@@ -53,7 +53,7 @@ export class AnswerService implements AnswerRepository {
                 `Question id ${questionId} was not found.`,
             );
 
-        const answerCreated = await this.prisma.answers.create({
+        const answerCreated = await this.prisma.answer.create({
             data: { ...data, userId, questionId },
             select: this.selectAnswer,
         });
@@ -66,12 +66,12 @@ export class AnswerService implements AnswerRepository {
     }
 
     async getAnswers(params: {
-        where?: Prisma.AnswersWhereInput;
-        orderBy?: Prisma.AnswersOrderByWithRelationInput;
+        where?: Prisma.AnswerWhereInput;
+        orderBy?: Prisma.AnswerOrderByWithRelationInput;
     }): Promise<AnswerDTO[]> {
         const { where, orderBy } = params;
 
-        const answers = await this.prisma.answers.findMany({
+        const answers = await this.prisma.answer.findMany({
             where,
             orderBy,
             select: this.selectAnswer,
@@ -84,8 +84,8 @@ export class AnswerService implements AnswerRepository {
         return answers;
     }
 
-    async getAnswer(where: Prisma.AnswersWhereUniqueInput): Promise<AnswerDTO> {
-        const answer = await this.prisma.answers.findUnique({
+    async getAnswer(where: Prisma.AnswerWhereUniqueInput): Promise<AnswerDTO> {
+        const answer = await this.prisma.answer.findUnique({
             where,
             select: this.selectAnswer,
         });
@@ -97,18 +97,18 @@ export class AnswerService implements AnswerRepository {
     }
 
     async updateAnswer(params: {
-        where: Prisma.AnswersWhereUniqueInput;
+        where: Prisma.AnswerWhereUniqueInput;
         data: UpdateAnswerDto;
     }): Promise<AnswerDTO> {
         const { where, data } = params;
 
-        const answer = await this.prisma.answers.findUnique({ where });
+        const answer = await this.prisma.answer.findUnique({ where });
         if (!answer)
             throw new NotFoundException(
                 `Answer ${Object.entries(where).map(([key, value]) => `${key} ${value}`)} was not found.`,
             );
 
-        const answerUpdated = await this.prisma.answers.update({
+        const answerUpdated = await this.prisma.answer.update({
             where,
             data,
             select: this.selectAnswer,
@@ -121,14 +121,14 @@ export class AnswerService implements AnswerRepository {
         return answerUpdated;
     }
 
-    async deleteAnswer(where: Prisma.AnswersWhereUniqueInput): Promise<void> {
-        const answer = await this.prisma.answers.findUnique({ where });
+    async deleteAnswer(where: Prisma.AnswerWhereUniqueInput): Promise<void> {
+        const answer = await this.prisma.answer.findUnique({ where });
         if (!answer)
             throw new NotFoundException(
                 `Answer ${Object.entries(where).map(([key, value]) => `${key} ${value}`)} was not found.`,
             );
 
-        const answerDeleted = await this.prisma.answers.delete({ where });
+        const answerDeleted = await this.prisma.answer.delete({ where });
         if (!answerDeleted)
             throw new NotFoundException(
                 'Something bad happened and the answer was not deleted.',

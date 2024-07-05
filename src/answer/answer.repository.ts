@@ -9,18 +9,18 @@ export abstract class AnswerRepository {
     ): Promise<AnswerDTO>;
 
     abstract getAnswers(params: {
-        where?: Prisma.AnswersWhereInput;
-        orderBy?: Prisma.AnswersOrderByWithRelationInput;
+        where?: Prisma.AnswerWhereInput;
+        orderBy?: Prisma.AnswerOrderByWithRelationInput;
     }): Promise<AnswerDTO[]>;
 
     abstract getAnswer(
-        where: Prisma.AnswersWhereUniqueInput,
+        where: Prisma.AnswerWhereUniqueInput,
     ): Promise<AnswerDTO>;
 
     abstract updateAnswer(params: {
-        where: Prisma.AnswersWhereUniqueInput;
+        where: Prisma.AnswerWhereUniqueInput;
         data: UpdateAnswerDto;
     }): Promise<AnswerDTO>;
 
-    abstract deleteAnswer(where: Prisma.AnswersWhereUniqueInput): Promise<void>;
+    abstract deleteAnswer(where: Prisma.AnswerWhereUniqueInput): Promise<void>;
 }

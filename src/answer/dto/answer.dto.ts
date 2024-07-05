@@ -1,7 +1,7 @@
 import {
     User as UserModel,
-    Questions as QuestionModel,
-    Answers,
+    Question as QuestionModel,
+    Answer as AnswerModel,
 } from '@prisma/client';
 
 type User = Pick<UserModel, 'id' | 'email' | 'name'>;
@@ -11,7 +11,7 @@ type Question =
           user: User;
       };
 
-export class AnswerDTO implements Omit<Answers, 'userId' | 'questionId'> {
+export class AnswerDTO implements Omit<AnswerModel, 'userId' | 'questionId'> {
     id: string;
     body: string;
     createdAt: Date;

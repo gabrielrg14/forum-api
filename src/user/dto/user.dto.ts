@@ -1,6 +1,6 @@
-import { User } from '@prisma/client';
+import { User as UserModel } from '@prisma/client';
 
-export class UserDTO implements Omit<User, 'password'> {
+export class UserDTO implements Omit<UserModel, 'password'> {
     id: string;
     email: string;
     name: string;
