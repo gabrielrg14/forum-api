@@ -12,7 +12,8 @@ import {
 } from '@nestjs/common';
 import { AnswerService } from './answer.service';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { AnswerDTO, CreateAnswerDto, UpdateAnswerDto } from './dto';
+import { AnswerDTO, CreateAnswerDTO, UpdateAnswerDTO } from './dto';
+import { RequestTokenDTO } from 'src/auth/dto';
 
 @Controller('answer')
 export class AnswerController {
@@ -21,8 +22,8 @@ export class AnswerController {
     @Post('/question/:uuid')
     @UseGuards(AuthGuard)
     createAnswer(
-        @Body() answerData: CreateAnswerDto,
-        @Request() req: { token: { sub: string } },
+        @Body() answerData: CreateAnswerDTO,
+        @Request() req: RequestTokenDTO,
         @Param('uuid', ParseUUIDPipe) questionId: string,
     ): Promise<AnswerDTO> {
         return this.answerService.createAnswer(
@@ -62,7 +63,7 @@ export class AnswerController {
     @UseGuards(AuthGuard)
     updateAnswerById(
         @Param('uuid', ParseUUIDPipe) answerId: string,
-        @Body() answerData: UpdateAnswerDto,
+        @Body() answerData: UpdateAnswerDTO,
     ): Promise<AnswerDTO> {
         return this.answerService.updateAnswer({
             where: { id: answerId },

@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { AnswerRepository } from './answer.repository';
 import { PrismaService } from 'src/database/prisma.service';
-import { AnswerDTO, CreateAnswerDto, UpdateAnswerDto } from './dto';
+import { AnswerDTO, CreateAnswerDTO, UpdateAnswerDTO } from './dto';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -35,7 +35,7 @@ export class AnswerService implements AnswerRepository {
     };
 
     async createAnswer(
-        data: CreateAnswerDto,
+        data: CreateAnswerDTO,
         userId: string,
         questionId: string,
     ): Promise<AnswerDTO> {
@@ -98,7 +98,7 @@ export class AnswerService implements AnswerRepository {
 
     async updateAnswer(params: {
         where: Prisma.AnswerWhereUniqueInput;
-        data: UpdateAnswerDto;
+        data: UpdateAnswerDTO;
     }): Promise<AnswerDTO> {
         const { where, data } = params;
 

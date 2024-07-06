@@ -12,7 +12,8 @@ import {
 } from '@nestjs/common';
 import { QuestionService } from './question.service';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { QuestionDTO, CreateQuestionDto, UpdateQuestionDto } from './dto';
+import { QuestionDTO, CreateQuestionDTO, UpdateQuestionDTO } from './dto';
+import { RequestTokenDTO } from 'src/auth/dto';
 
 @Controller('question')
 export class QuestionController {
@@ -21,8 +22,8 @@ export class QuestionController {
     @Post()
     @UseGuards(AuthGuard)
     createQuestion(
-        @Body() questionData: CreateQuestionDto,
-        @Request() req: { token: { sub: string } },
+        @Body() questionData: CreateQuestionDTO,
+        @Request() req: RequestTokenDTO,
     ): Promise<QuestionDTO> {
         return this.questionService.createQuestion(questionData, req.token.sub);
     }
@@ -52,7 +53,7 @@ export class QuestionController {
     @UseGuards(AuthGuard)
     updateQuestionById(
         @Param('uuid', ParseUUIDPipe) questionId: string,
-        @Body() questionData: UpdateQuestionDto,
+        @Body() questionData: UpdateQuestionDTO,
     ): Promise<QuestionDTO> {
         return this.questionService.updateQuestion({
             where: { id: questionId },

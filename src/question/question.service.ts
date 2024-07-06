@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { QuestionRepository } from './question.repository';
 import { PrismaService } from 'src/database/prisma.service';
-import { QuestionDTO, CreateQuestionDto, UpdateQuestionDto } from './dto';
+import { QuestionDTO, CreateQuestionDTO, UpdateQuestionDTO } from './dto';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -28,7 +28,7 @@ export class QuestionService implements QuestionRepository {
     };
 
     async createQuestion(
-        data: CreateQuestionDto,
+        data: CreateQuestionDTO,
         userId: string,
     ): Promise<QuestionDTO> {
         const user = await this.prisma.user.findUnique({
@@ -84,7 +84,7 @@ export class QuestionService implements QuestionRepository {
 
     async updateQuestion(params: {
         where: Prisma.QuestionWhereUniqueInput;
-        data: UpdateQuestionDto;
+        data: UpdateQuestionDTO;
     }): Promise<QuestionDTO> {
         const { where, data } = params;
 

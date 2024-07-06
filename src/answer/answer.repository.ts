@@ -1,9 +1,9 @@
-import { AnswerDTO, CreateAnswerDto, UpdateAnswerDto } from './dto';
+import { AnswerDTO, CreateAnswerDTO, UpdateAnswerDTO } from './dto';
 import { Prisma } from '@prisma/client';
 
 export abstract class AnswerRepository {
     abstract createAnswer(
-        data: CreateAnswerDto,
+        data: CreateAnswerDTO,
         userId: string,
         questionId: string,
     ): Promise<AnswerDTO>;
@@ -19,7 +19,7 @@ export abstract class AnswerRepository {
 
     abstract updateAnswer(params: {
         where: Prisma.AnswerWhereUniqueInput;
-        data: UpdateAnswerDto;
+        data: UpdateAnswerDTO;
     }): Promise<AnswerDTO>;
 
     abstract deleteAnswer(where: Prisma.AnswerWhereUniqueInput): Promise<void>;
