@@ -2,9 +2,10 @@ import {
     Controller,
     UseGuards,
     ParseUUIDPipe,
-    Param,
     Body,
     Request,
+    Param,
+    Query,
     Post,
     Get,
     Put,
@@ -34,8 +35,10 @@ export class AnswerController {
     }
 
     @Get()
-    getAllAnswers(): Promise<AnswerDTO[]> {
-        return this.answerService.getAnswers({});
+    getAllAnswers(@Query('search') search: string): Promise<AnswerDTO[]> {
+        return this.answerService.getAnswers({
+            where: { body: { contains: search } },
+        });
     }
 
     @Get('/question/:uuid')

@@ -2,8 +2,9 @@ import {
     Controller,
     UseGuards,
     ParseUUIDPipe,
-    Param,
     Body,
+    Query,
+    Param,
     Get,
     Post,
     Put,
@@ -29,8 +30,17 @@ export class UserController {
     }
 
     @Get()
-    getAllUsers(): Promise<UserDTO[]> {
-        return this.userService.getUsers({});
+    getAllUsers(@Query('search') search: string): Promise<UserDTO[]> {
+        return this.userService.getUsers({
+            where: {
+                OR: [
+                    {
+                        name: { contains: search },
+                        email: { contains: search },
+                    },
+                ],
+            },
+        });
     }
 
     @Get('/:uuid')
