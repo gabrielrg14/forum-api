@@ -1,7 +1,8 @@
 import {
     Injectable,
-    NotFoundException,
+    ConflictException,
     BadRequestException,
+    NotFoundException,
 } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { PrismaService } from 'src/database/prisma.service';
@@ -32,7 +33,7 @@ export class UserService implements UserRepository {
 
         const user = await this.prisma.user.findUnique({ where: { email } });
         if (user)
-            throw new BadRequestException(
+            throw new ConflictException(
                 `A user with the email ${email} is already registered.`,
             );
 
@@ -95,6 +96,16 @@ export class UserService implements UserRepository {
             throw new NotFoundException(
                 `User ${Object.entries(where).map(([key, value]) => `${key} ${value}`)} was not found.`,
             );
+
+        if (data.email) {
+            const emailUser = await this.prisma.user.findUnique({
+                where: { email: data.email },
+            });
+            if (emailUser && emailUser.id !== user.id)
+                throw new ConflictException(
+                    `A user with the email ${data.email} is already registered.`,
+                );
+        }
 
         const userUpdated = await this.prisma.user.update({
             where,
