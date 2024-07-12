@@ -66,12 +66,16 @@ export class AnswerService implements AnswerRepository {
     }
 
     async getAnswers(params: {
+        skip?: number;
+        take?: number;
         where?: Prisma.AnswerWhereInput;
         orderBy?: Prisma.AnswerOrderByWithRelationInput;
     }): Promise<AnswerDTO[]> {
-        const { where, orderBy } = params;
+        const { skip, take, where, orderBy } = params;
 
         const answers = await this.prisma.answer.findMany({
+            skip,
+            take,
             where,
             orderBy,
             select: this.selectAnswer,

@@ -10,8 +10,13 @@ Content-Type: application/json
 
 ###
 
-# GET ALL USERS
-GET http://localhost:3000/user
+# GET ALL USERS (WITH PAGINATION)
+GET http://localhost:3000/user?page=1&pageSize=10
+
+###
+
+# GET ALL USERS (WITH SEARCH)
+GET http://localhost:3000/user?search=put
 
 ###
 

@@ -55,12 +55,16 @@ export class UserService implements UserRepository {
     }
 
     async getUsers(params: {
+        skip?: number;
+        take?: number;
         where?: Prisma.UserWhereInput;
         orderBy?: Prisma.UserOrderByWithRelationInput;
     }): Promise<UserDTO[]> {
-        const { where, orderBy } = params;
+        const { skip, take, where, orderBy } = params;
 
         const users = await this.prisma.user.findMany({
+            skip,
+            take,
             where,
             orderBy,
             select: this.userSelect,

@@ -9,8 +9,13 @@ Content-Type: application/json
 
 ###
 
-# GET ALL ANSWERS
-GET http://localhost:3000/answer
+# GET ALL ANSWERS (WITH PAGINATION)
+GET http://localhost:3000/answer?page=1&pageSize=10
+
+###
+
+# GET ALL ANSWERS (WITH SEARCH)
+GET http://localhost:3000/answer?search=put
 
 ###
 

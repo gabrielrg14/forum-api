@@ -13,8 +13,14 @@ import {
 } from '@nestjs/common';
 import { QuestionService } from './question.service';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { QuestionDTO, CreateQuestionDTO, UpdateQuestionDTO } from './dto';
+import {
+    QuestionDTO,
+    QuestionQueryParams,
+    CreateQuestionDTO,
+    UpdateQuestionDTO,
+} from './dto';
 import { RequestTokenDTO } from 'src/auth/dto';
+import { Prisma } from '@prisma/client';
 
 @Controller('question')
 export class QuestionController {
@@ -30,16 +36,33 @@ export class QuestionController {
     }
 
     @Get()
-    getAllQuestions(@Query('search') search: string): Promise<QuestionDTO[]> {
+    getAllQuestions(
+        @Query() query: QuestionQueryParams,
+    ): Promise<QuestionDTO[]> {
+        const where: Prisma.QuestionWhereInput = {};
+        let skip: number | undefined = undefined;
+        let take: number | undefined = undefined;
+
+        if (query.search)
+            where.OR = [
+                {
+                    title: { contains: query.search },
+                    body: { contains: query.search },
+                },
+            ];
+
+        if (query.page && query.pageSize) {
+            const page = Math.max(0, Number(query.page) - 1);
+            const pageSize = Number(query.pageSize);
+            skip = page * pageSize;
+            take = pageSize;
+        }
+
         return this.questionService.getQuestions({
-            where: {
-                OR: [
-                    {
-                        title: { contains: search },
-                        body: { contains: search },
-                    },
-                ],
-            },
+            skip,
+            take,
+            where,
+            orderBy: { createdAt: 'desc' },
         });
     }
 
@@ -49,6 +72,7 @@ export class QuestionController {
     ): Promise<QuestionDTO[]> {
         return this.questionService.getQuestions({
             where: { userId },
+            orderBy: { createdAt: 'desc' },
         });
     }
 

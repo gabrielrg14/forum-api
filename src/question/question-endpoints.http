@@ -10,8 +10,13 @@ Content-Type: application/json
 
 ###
 
-# GET ALL QUESTIONS
-GET http://localhost:3000/question
+# GET ALL QUESTIONS (WITH PAGINATION)
+GET http://localhost:3000/question?page=1&pageSize=10
+
+###
+
+# GET ALL QUESTIONS (WITH SEARCH)
+GET http://localhost:3000/question?search=put
 
 ###
 

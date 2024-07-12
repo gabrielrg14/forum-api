@@ -13,8 +13,14 @@ import {
 } from '@nestjs/common';
 import { AnswerService } from './answer.service';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { AnswerDTO, CreateAnswerDTO, UpdateAnswerDTO } from './dto';
+import {
+    AnswerDTO,
+    AnswerQueryParams,
+    CreateAnswerDTO,
+    UpdateAnswerDTO,
+} from './dto';
 import { RequestTokenDTO } from 'src/auth/dto';
+import { Prisma } from '@prisma/client';
 
 @Controller('answer')
 export class AnswerController {
@@ -35,9 +41,30 @@ export class AnswerController {
     }
 
     @Get()
-    getAllAnswers(@Query('search') search: string): Promise<AnswerDTO[]> {
+    getAllAnswers(@Query() query: AnswerQueryParams): Promise<AnswerDTO[]> {
+        const where: Prisma.AnswerWhereInput = {};
+        let skip: number | undefined = undefined;
+        let take: number | undefined = undefined;
+
+        if (query.search)
+            where.OR = [
+                {
+                    body: { contains: query.search },
+                },
+            ];
+
+        if (query.page && query.pageSize) {
+            const page = Math.max(0, Number(query.page) - 1);
+            const pageSize = Number(query.pageSize);
+            skip = page * pageSize;
+            take = pageSize;
+        }
+
         return this.answerService.getAnswers({
-            where: { body: { contains: search } },
+            skip,
+            take,
+            where,
+            orderBy: { createdAt: 'desc' },
         });
     }
 
@@ -45,14 +72,20 @@ export class AnswerController {
     getAllQuestionAnswers(
         @Param('uuid', ParseUUIDPipe) questionId: string,
     ): Promise<AnswerDTO[]> {
-        return this.answerService.getAnswers({ where: { questionId } });
+        return this.answerService.getAnswers({
+            where: { questionId },
+            orderBy: { createdAt: 'desc' },
+        });
     }
 
     @Get('/user/:uuid')
     getAllUserAnswers(
         @Param('uuid', ParseUUIDPipe) userId: string,
     ): Promise<AnswerDTO[]> {
-        return this.answerService.getAnswers({ where: { userId } });
+        return this.answerService.getAnswers({
+            where: { userId },
+            orderBy: { createdAt: 'desc' },
+        });
     }
 
     @Get('/:uuid')

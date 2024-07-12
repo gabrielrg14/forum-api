@@ -50,12 +50,16 @@ export class QuestionService implements QuestionRepository {
     }
 
     async getQuestions(params: {
+        skip?: number;
+        take?: number;
         where?: Prisma.QuestionWhereInput;
         orderBy?: Prisma.QuestionOrderByWithRelationInput;
     }): Promise<QuestionDTO[]> {
-        const { where, orderBy } = params;
+        const { skip, take, where, orderBy } = params;
 
         const questions = await this.prisma.question.findMany({
+            skip,
+            take,
             where,
             orderBy,
             select: this.selectQuestion,

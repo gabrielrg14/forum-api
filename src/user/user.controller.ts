@@ -15,10 +15,12 @@ import { UserService } from './user.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import {
     UserDTO,
+    UserQueryParams,
     CreateUserDTO,
     UpdateUserDTO,
     UpdateUserPasswordDTO,
 } from './dto';
+import { Prisma } from '@prisma/client';
 
 @Controller('user')
 export class UserController {
@@ -30,16 +32,31 @@ export class UserController {
     }
 
     @Get()
-    getAllUsers(@Query('search') search: string): Promise<UserDTO[]> {
+    getAllUsers(@Query() query: UserQueryParams): Promise<UserDTO[]> {
+        const where: Prisma.UserWhereInput = {};
+        let skip: number | undefined = undefined;
+        let take: number | undefined = undefined;
+
+        if (query.search)
+            where.OR = [
+                {
+                    name: { contains: query.search },
+                    email: { contains: query.search },
+                },
+            ];
+
+        if (query.page && query.pageSize) {
+            const page = Math.max(0, Number(query.page) - 1);
+            const pageSize = Number(query.pageSize);
+            skip = page * pageSize;
+            take = pageSize;
+        }
+
         return this.userService.getUsers({
-            where: {
-                OR: [
-                    {
-                        name: { contains: search },
-                        email: { contains: search },
-                    },
-                ],
-            },
+            skip,
+            take,
+            where,
+            orderBy: { name: 'asc' },
         });
     }
 
