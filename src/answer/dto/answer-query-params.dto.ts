@@ -1,9 +1,17 @@
-import { IsOptional, IsString, IsNumberString } from 'class-validator';
+import { IsOptional, IsString, IsUUID, IsNumberString } from 'class-validator';
 
 export class AnswerQueryParams {
     @IsOptional()
     @IsString()
     search: string;
+
+    @IsOptional()
+    @IsUUID()
+    questionId: string;
+
+    @IsOptional()
+    @IsUUID()
+    userId: string;
 
     @IsOptional()
     @IsNumberString({ no_symbols: true })

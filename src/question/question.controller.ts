@@ -51,6 +51,8 @@ export class QuestionController {
                 },
             ];
 
+        if (query.userId) where.userId = query.userId;
+
         if (query.page && query.pageSize) {
             const page = Math.max(0, Number(query.page) - 1);
             const pageSize = Number(query.pageSize);
@@ -62,16 +64,6 @@ export class QuestionController {
             skip,
             take,
             where,
-            orderBy: { createdAt: 'desc' },
-        });
-    }
-
-    @Get('/user/:uuid')
-    getAllUserQuestions(
-        @Param('uuid', ParseUUIDPipe) userId: string,
-    ): Promise<QuestionDTO[]> {
-        return this.questionService.getQuestions({
-            where: { userId },
             orderBy: { createdAt: 'desc' },
         });
     }

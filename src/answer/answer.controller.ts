@@ -53,6 +53,10 @@ export class AnswerController {
                 },
             ];
 
+        if (query.questionId) where.questionId = query.questionId;
+
+        if (query.userId) where.userId = query.userId;
+
         if (query.page && query.pageSize) {
             const page = Math.max(0, Number(query.page) - 1);
             const pageSize = Number(query.pageSize);
@@ -64,26 +68,6 @@ export class AnswerController {
             skip,
             take,
             where,
-            orderBy: { createdAt: 'desc' },
-        });
-    }
-
-    @Get('/question/:uuid')
-    getAllQuestionAnswers(
-        @Param('uuid', ParseUUIDPipe) questionId: string,
-    ): Promise<AnswerDTO[]> {
-        return this.answerService.getAnswers({
-            where: { questionId },
-            orderBy: { createdAt: 'desc' },
-        });
-    }
-
-    @Get('/user/:uuid')
-    getAllUserAnswers(
-        @Param('uuid', ParseUUIDPipe) userId: string,
-    ): Promise<AnswerDTO[]> {
-        return this.answerService.getAnswers({
-            where: { userId },
             orderBy: { createdAt: 'desc' },
         });
     }

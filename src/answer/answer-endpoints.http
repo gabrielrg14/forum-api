@@ -20,12 +20,12 @@ GET http://localhost:3000/answer?search=put
 ###
 
 # GET QUESTION ANSWERS
-GET http://localhost:3000/answer/question/50bfc16f-29ce-470a-9e0a-307431480703
+GET http://localhost:3000/answer?questionId=50bfc16f-29ce-470a-9e0a-307431480703
 
 ###
 
 # GET USER ANSWERS
-GET http://localhost:3000/answer/user/c3f3d19c-53fe-4968-b00c-11434d21c71c
+GET http://localhost:3000/answer?userId=c3f3d19c-53fe-4968-b00c-11434d21c71c
 
 ###
 
