@@ -8,9 +8,11 @@ import * as bcrypt from 'bcrypt';
 @Injectable()
 export class AuthService implements AuthRepository {
     constructor(
-        private prisma: PrismaService,
-        private jwtService: JwtService,
+        private readonly prisma: PrismaService,
+        private readonly jwtService: JwtService,
     ) {}
+
+    private readonly invalidMessage = 'Invalid credentials.';
 
     async authUser(authData: AuthDTO): Promise<AuthTokenDTO> {
         const { email, password } = authData;
@@ -18,15 +20,15 @@ export class AuthService implements AuthRepository {
         const user = await this.prisma.user.findUnique({
             where: { email },
         });
-        if (!user) throw new UnauthorizedException('Invalid credentials.');
+        if (!user) throw new UnauthorizedException(this.invalidMessage);
 
         const passwordMatch = await bcrypt.compareSync(password, user.password);
         if (!passwordMatch)
-            throw new UnauthorizedException('Invalid credentials.');
+            throw new UnauthorizedException(this.invalidMessage);
 
         const payload = { sub: user.id };
         return {
-            access_token: await this.jwtService.signAsync(payload),
+            token: await this.jwtService.signAsync(payload),
         };
     }
 }

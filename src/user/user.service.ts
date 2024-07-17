@@ -17,7 +17,7 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService implements UserRepository {
-    constructor(private prisma: PrismaService) {}
+    constructor(private readonly prisma: PrismaService) {}
 
     private readonly hashSalt = 10;
     private readonly userSelect = {

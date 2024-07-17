@@ -24,7 +24,7 @@ import { Prisma } from '@prisma/client';
 
 @Controller('user')
 export class UserController {
-    constructor(private userService: UserService) {}
+    constructor(private readonly userService: UserService) {}
 
     @Post()
     createUser(@Body() userData: CreateUserDTO): Promise<UserDTO> {
