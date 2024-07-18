@@ -29,7 +29,7 @@ export class UserService implements UserRepository {
     };
 
     async createUser(data: CreateUserDTO): Promise<UserDTO> {
-        const { email } = data;
+        const { email, password } = data;
 
         const user = await this.prisma.user.findUnique({ where: { email } });
         if (user)
@@ -37,10 +37,7 @@ export class UserService implements UserRepository {
                 `A user with the email ${email} is already registered.`,
             );
 
-        const passwordHash = await bcrypt.hashSync(
-            data.password,
-            this.hashSalt,
-        );
+        const passwordHash = await bcrypt.hashSync(password, this.hashSalt);
 
         const userCreated = await this.prisma.user.create({
             data: { ...data, password: passwordHash },

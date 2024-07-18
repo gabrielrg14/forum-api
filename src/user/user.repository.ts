@@ -9,12 +9,14 @@ import {
 export abstract class UserRepository {
     abstract createUser(data: CreateUserDTO): Promise<UserDTO>;
 
-    abstract getUser(where: Prisma.UserWhereUniqueInput): Promise<UserDTO>;
-
     abstract getUsers(params: {
+        skip?: number;
+        take?: number;
         where?: Prisma.UserWhereInput;
         orderBy?: Prisma.UserOrderByWithRelationInput;
     }): Promise<UserDTO[]>;
+
+    abstract getUser(where: Prisma.UserWhereUniqueInput): Promise<UserDTO>;
 
     abstract updateUser(params: {
         where: Prisma.UserWhereUniqueInput;
