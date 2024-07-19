@@ -34,6 +34,21 @@ export class AnswerService implements AnswerRepository {
         question: { select: this.questionSelect },
     };
 
+    private readonly badRequestMessage = (
+        subject: string,
+        adjective: string,
+    ): string => {
+        return `Something bad happened and the ${subject} was not ${adjective}.`;
+    };
+    private readonly notFoundMessage = (
+        subject: string,
+        where: Prisma.AnswerWhereUniqueInput,
+    ): string => {
+        return `${subject} ${Object.entries(where)
+            .map(([key, value]) => `${key} ${value}`)
+            .join(', ')} was not found.`;
+    };
+
     async createAnswer(
         data: CreateAnswerDTO,
         userId: string,
@@ -43,14 +58,16 @@ export class AnswerService implements AnswerRepository {
             where: { id: userId },
         });
         if (!user)
-            throw new NotFoundException(`User id ${userId} was not found.`);
+            throw new NotFoundException(
+                this.notFoundMessage('User', { id: userId }),
+            );
 
         const question = await this.prisma.question.findUnique({
             where: { id: questionId },
         });
         if (!question)
             throw new NotFoundException(
-                `Question id ${questionId} was not found.`,
+                this.notFoundMessage('Question', { id: questionId }),
             );
 
         const answerCreated = await this.prisma.answer.create({
@@ -59,7 +76,7 @@ export class AnswerService implements AnswerRepository {
         });
         if (!answerCreated)
             throw new BadRequestException(
-                'Something bad happened and the answer was not created.',
+                this.badRequestMessage('answer', 'created'),
             );
 
         return answerCreated;
@@ -73,31 +90,29 @@ export class AnswerService implements AnswerRepository {
     }): Promise<AnswerDTO[]> {
         const { skip, take, where, orderBy } = params;
 
-        const answers = await this.prisma.answer.findMany({
+        const answersFound = await this.prisma.answer.findMany({
             skip,
             take,
             where,
             orderBy,
             select: this.selectAnswer,
         });
-        if (!answers)
+        if (!answersFound)
             throw new BadRequestException(
-                'Something bad happened and the answers was not found.',
+                this.badRequestMessage('answers', 'found'),
             );
 
-        return answers;
+        return answersFound;
     }
 
     async getAnswer(where: Prisma.AnswerWhereUniqueInput): Promise<AnswerDTO> {
-        const answer = await this.prisma.answer.findUnique({
+        const answerFound = await this.prisma.answer.findUnique({
             where,
             select: this.selectAnswer,
         });
-        if (!answer)
-            throw new NotFoundException(
-                `Answer ${Object.entries(where).map(([key, value]) => `${key} ${value}`)} was not found.`,
-            );
-        return answer;
+        if (!answerFound)
+            throw new NotFoundException(this.notFoundMessage('Answer', where));
+        return answerFound;
     }
 
     async updateAnswer(params: {
@@ -108,34 +123,30 @@ export class AnswerService implements AnswerRepository {
 
         const answer = await this.prisma.answer.findUnique({ where });
         if (!answer)
-            throw new NotFoundException(
-                `Answer ${Object.entries(where).map(([key, value]) => `${key} ${value}`)} was not found.`,
-            );
+            throw new NotFoundException(this.notFoundMessage('Answer', where));
 
-        const answerUpdated = await this.prisma.answer.update({
+        const updatedAnswer = await this.prisma.answer.update({
             where,
             data,
             select: this.selectAnswer,
         });
-        if (!answerUpdated)
+        if (!updatedAnswer)
             throw new BadRequestException(
-                'Something bad happened and the answer was not updated.',
+                this.badRequestMessage('answer', 'updated'),
             );
 
-        return answerUpdated;
+        return updatedAnswer;
     }
 
     async deleteAnswer(where: Prisma.AnswerWhereUniqueInput): Promise<void> {
         const answer = await this.prisma.answer.findUnique({ where });
         if (!answer)
-            throw new NotFoundException(
-                `Answer ${Object.entries(where).map(([key, value]) => `${key} ${value}`)} was not found.`,
-            );
+            throw new NotFoundException(this.notFoundMessage('Answer', where));
 
-        const answerDeleted = await this.prisma.answer.delete({ where });
-        if (!answerDeleted)
-            throw new NotFoundException(
-                'Something bad happened and the answer was not deleted.',
+        const deletedAnswer = await this.prisma.answer.delete({ where });
+        if (!deletedAnswer)
+            throw new BadRequestException(
+                this.badRequestMessage('answer', 'deleted'),
             );
     }
 }

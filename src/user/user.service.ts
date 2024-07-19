@@ -28,14 +28,28 @@ export class UserService implements UserRepository {
         updatedAt: true,
     };
 
+    private readonly conflictMessage = (email: string): string => {
+        return `A user with the email ${email} is already registered.`;
+    };
+    private readonly badRequestMessage = (
+        subject: string,
+        adjective: string,
+    ): string => {
+        return `Something bad happened and the ${subject} was not ${adjective}.`;
+    };
+    private readonly notFoundMessage = (
+        where: Prisma.UserWhereUniqueInput,
+    ): string => {
+        return `User ${Object.entries(where)
+            .map(([key, value]) => `${key} ${value}`)
+            .join(', ')} was not found.`;
+    };
+
     async createUser(data: CreateUserDTO): Promise<UserDTO> {
         const { email, password } = data;
 
         const user = await this.prisma.user.findUnique({ where: { email } });
-        if (user)
-            throw new ConflictException(
-                `A user with the email ${email} is already registered.`,
-            );
+        if (user) throw new ConflictException(this.conflictMessage(email));
 
         const passwordHash = await bcrypt.hashSync(password, this.hashSalt);
 
@@ -45,7 +59,7 @@ export class UserService implements UserRepository {
         });
         if (!userCreated)
             throw new BadRequestException(
-                'Something bad happened and the user was not created.',
+                this.badRequestMessage('user', 'created'),
             );
 
         return userCreated;
@@ -59,31 +73,29 @@ export class UserService implements UserRepository {
     }): Promise<UserDTO[]> {
         const { skip, take, where, orderBy } = params;
 
-        const users = await this.prisma.user.findMany({
+        const usersFound = await this.prisma.user.findMany({
             skip,
             take,
             where,
             orderBy,
             select: this.userSelect,
         });
-        if (!users)
+        if (!usersFound)
             throw new BadRequestException(
-                'Something bad happened and the users was not found.',
+                this.badRequestMessage('users', 'found'),
             );
 
-        return users;
+        return usersFound;
     }
 
     async getUser(where: Prisma.UserWhereUniqueInput): Promise<UserDTO> {
-        const user = await this.prisma.user.findUnique({
+        const userFound = await this.prisma.user.findUnique({
             where,
             select: this.userSelect,
         });
-        if (!user)
-            throw new NotFoundException(
-                `User ${Object.entries(where).map(([key, value]) => `${key} ${value}`)} was not found.`,
-            );
-        return user;
+        if (!userFound)
+            throw new NotFoundException(this.notFoundMessage(where));
+        return userFound;
     }
 
     async updateUser(params: {
@@ -93,32 +105,27 @@ export class UserService implements UserRepository {
         const { where, data } = params;
 
         const user = await this.prisma.user.findUnique({ where });
-        if (!user)
-            throw new NotFoundException(
-                `User ${Object.entries(where).map(([key, value]) => `${key} ${value}`)} was not found.`,
-            );
+        if (!user) throw new NotFoundException(this.notFoundMessage(where));
 
         if (data.email) {
-            const emailUser = await this.prisma.user.findUnique({
+            const userEmail = await this.prisma.user.findUnique({
                 where: { email: data.email },
             });
-            if (emailUser && emailUser.id !== user.id)
-                throw new ConflictException(
-                    `A user with the email ${data.email} is already registered.`,
-                );
+            if (userEmail && userEmail.id !== user.id)
+                throw new ConflictException(this.conflictMessage(data.email));
         }
 
-        const userUpdated = await this.prisma.user.update({
+        const updatedUser = await this.prisma.user.update({
             where,
             data,
             select: this.userSelect,
         });
-        if (!userUpdated)
+        if (!updatedUser)
             throw new BadRequestException(
-                'Something bad happened and the user was not updated.',
+                this.badRequestMessage('user', 'updated'),
             );
 
-        return userUpdated;
+        return updatedUser;
     }
 
     async updateUserPassword(params: {
@@ -128,40 +135,34 @@ export class UserService implements UserRepository {
         const { where, data } = params;
 
         const user = await this.prisma.user.findUnique({ where });
-        if (!user)
-            throw new NotFoundException(
-                `User ${Object.entries(where).map(([key, value]) => `${key} ${value}`)} was not found.`,
-            );
+        if (!user) throw new NotFoundException(this.notFoundMessage(where));
 
         const passwordHash = await bcrypt.hashSync(
             data.password,
             this.hashSalt,
         );
 
-        const userUpdated = await this.prisma.user.update({
+        const updatedUser = await this.prisma.user.update({
             where,
             data: { password: passwordHash },
             select: this.userSelect,
         });
-        if (!userUpdated)
+        if (!updatedUser)
             throw new BadRequestException(
-                'Something bad happened and the password was not changed.',
+                this.badRequestMessage('password', 'changed'),
             );
 
-        return userUpdated;
+        return updatedUser;
     }
 
     async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<void> {
         const user = await this.prisma.user.findUnique({ where });
-        if (!user)
-            throw new NotFoundException(
-                `User ${Object.entries(where).map(([key, value]) => `${key} ${value}`)} was not found.`,
-            );
+        if (!user) throw new NotFoundException(this.notFoundMessage(where));
 
-        const userDeleted = await this.prisma.user.delete({ where });
-        if (!userDeleted)
+        const deletedUser = await this.prisma.user.delete({ where });
+        if (!deletedUser)
             throw new BadRequestException(
-                'Something bad happened and the user was not deleted.',
+                this.badRequestMessage('user', 'deleted'),
             );
     }
 }

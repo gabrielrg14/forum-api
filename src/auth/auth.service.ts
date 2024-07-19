@@ -12,7 +12,7 @@ export class AuthService implements AuthRepository {
         private readonly jwtService: JwtService,
     ) {}
 
-    private readonly invalidMessage = 'Invalid credentials.';
+    private readonly unauthorizedMessage = 'Invalid credentials.';
 
     async authUser(authData: AuthDTO): Promise<AuthTokenDTO> {
         const { email, password } = authData;
@@ -20,11 +20,11 @@ export class AuthService implements AuthRepository {
         const user = await this.prisma.user.findUnique({
             where: { email },
         });
-        if (!user) throw new UnauthorizedException(this.invalidMessage);
+        if (!user) throw new UnauthorizedException(this.unauthorizedMessage);
 
         const passwordMatch = await bcrypt.compareSync(password, user.password);
         if (!passwordMatch)
-            throw new UnauthorizedException(this.invalidMessage);
+            throw new UnauthorizedException(this.unauthorizedMessage);
 
         const payload = { sub: user.id };
         return {
