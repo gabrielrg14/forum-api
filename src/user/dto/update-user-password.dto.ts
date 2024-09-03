@@ -1,6 +1,10 @@
-import { IsNotEmpty, IsStrongPassword } from 'class-validator';
+import { IsNotEmpty, IsString, IsStrongPassword } from 'class-validator';
 
 export class UpdateUserPasswordDTO {
+    @IsNotEmpty()
+    @IsString()
+    currentPassword: string;
+
     @IsNotEmpty()
     @IsStrongPassword({
         minLength: 8,
@@ -10,4 +14,8 @@ export class UpdateUserPasswordDTO {
         minSymbols: 1,
     })
     password?: string;
+
+    @IsNotEmpty()
+    @IsString()
+    passwordConfirmation: string;
 }

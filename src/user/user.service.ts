@@ -3,6 +3,7 @@ import {
     ConflictException,
     BadRequestException,
     NotFoundException,
+    UnauthorizedException,
 } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { PrismaService } from 'src/database/prisma.service';
@@ -46,10 +47,16 @@ export class UserService implements UserRepository {
     };
 
     async createUser(data: CreateUserDTO): Promise<UserDTO> {
-        const { email, password } = data;
+        const { email, password, passwordConfirmation } = data;
 
         const user = await this.prisma.user.findUnique({ where: { email } });
         if (user) throw new ConflictException(this.conflictMessage(email));
+
+        if (password !== passwordConfirmation)
+            throw new BadRequestException(
+                'Password and password confirmation do not match.',
+            );
+        delete data.passwordConfirmation;
 
         const passwordHash = await bcrypt.hashSync(password, this.hashSalt);
 
@@ -134,8 +141,17 @@ export class UserService implements UserRepository {
     }): Promise<UserDTO> {
         const { where, data } = params;
 
+        if (data.password !== data.passwordConfirmation)
+            throw new BadRequestException(
+                'Password and password confirmation do not match.',
+            );
+
         const user = await this.prisma.user.findUnique({ where });
         if (!user) throw new NotFoundException(this.notFoundMessage(where));
+
+        const isMatch = bcrypt.compareSync(data.currentPassword, user.password);
+        if (!isMatch)
+            throw new UnauthorizedException('Invalid current password!');
 
         const passwordHash = await bcrypt.hashSync(
             data.password,

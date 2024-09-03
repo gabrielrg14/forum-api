@@ -23,4 +23,8 @@ export class CreateUserDTO {
         minSymbols: 1,
     })
     password: string;
+
+    @IsNotEmpty()
+    @IsString()
+    passwordConfirmation: string;
 }
