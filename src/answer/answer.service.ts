@@ -1,16 +1,16 @@
-import {
-    Injectable,
-    BadRequestException,
-    NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AnswerRepository } from './answer.repository';
 import { PrismaService } from 'src/database/prisma.service';
+import { ExceptionService } from 'src/exception/exception.service';
 import { AnswerDTO, CreateAnswerDTO, UpdateAnswerDTO } from './dto';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class AnswerService implements AnswerRepository {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly exceptionService: ExceptionService,
+    ) {}
 
     private readonly userSelect = {
         id: true,
@@ -34,21 +34,6 @@ export class AnswerService implements AnswerRepository {
         question: { select: this.questionSelect },
     };
 
-    private readonly badRequestMessage = (
-        subject: string,
-        adjective: string,
-    ): string => {
-        return `Something bad happened and the ${subject} was not ${adjective}.`;
-    };
-    private readonly notFoundMessage = (
-        subject: string,
-        where: Prisma.AnswerWhereUniqueInput,
-    ): string => {
-        return `${subject} ${Object.entries(where)
-            .map(([key, value]) => `${key} ${value}`)
-            .join(', ')} was not found.`;
-    };
-
     async createAnswer(
         data: CreateAnswerDTO,
         userId: string,
@@ -58,28 +43,28 @@ export class AnswerService implements AnswerRepository {
             where: { id: userId },
         });
         if (!user)
-            throw new NotFoundException(
-                this.notFoundMessage('User', { id: userId }),
+            this.exceptionService.subjectNotFound<Prisma.UserWhereUniqueInput>(
+                'User',
+                { id: userId },
             );
 
         const question = await this.prisma.question.findUnique({
             where: { id: questionId },
         });
         if (!question)
-            throw new NotFoundException(
-                this.notFoundMessage('Question', { id: questionId }),
+            this.exceptionService.subjectNotFound<Prisma.QuestionWhereUniqueInput>(
+                'Question',
+                { id: questionId },
             );
 
-        const answerCreated = await this.prisma.answer.create({
-            data: { ...data, userId, questionId },
-            select: this.selectAnswer,
-        });
-        if (!answerCreated)
-            throw new BadRequestException(
-                this.badRequestMessage('answer', 'created'),
-            );
-
-        return answerCreated;
+        try {
+            return await this.prisma.answer.create({
+                data: { ...data, userId, questionId },
+                select: this.selectAnswer,
+            });
+        } catch (error) {
+            this.exceptionService.somethingBadHappened('answer', 'created');
+        }
     }
 
     async getAnswers(params: {
@@ -90,29 +75,34 @@ export class AnswerService implements AnswerRepository {
     }): Promise<AnswerDTO[]> {
         const { skip, take, where, orderBy } = params;
 
-        const answersFound = await this.prisma.answer.findMany({
-            skip,
-            take,
-            where,
-            orderBy,
-            select: this.selectAnswer,
-        });
-        if (!answersFound)
-            throw new BadRequestException(
-                this.badRequestMessage('answers', 'found'),
-            );
-
-        return answersFound;
+        try {
+            return await this.prisma.answer.findMany({
+                skip,
+                take,
+                where,
+                orderBy,
+                select: this.selectAnswer,
+            });
+        } catch (error) {
+            this.exceptionService.somethingBadHappened('answers', 'found');
+        }
     }
 
     async getAnswer(where: Prisma.AnswerWhereUniqueInput): Promise<AnswerDTO> {
-        const answerFound = await this.prisma.answer.findUnique({
-            where,
-            select: this.selectAnswer,
-        });
-        if (!answerFound)
-            throw new NotFoundException(this.notFoundMessage('Answer', where));
-        return answerFound;
+        try {
+            const answerFound = await this.prisma.answer.findUnique({
+                where,
+                select: this.selectAnswer,
+            });
+            if (!answerFound)
+                this.exceptionService.subjectNotFound<Prisma.AnswerWhereUniqueInput>(
+                    'Answer',
+                    where,
+                );
+            return answerFound;
+        } catch (error) {
+            throw error;
+        }
     }
 
     async updateAnswer(params: {
@@ -123,30 +113,34 @@ export class AnswerService implements AnswerRepository {
 
         const answer = await this.prisma.answer.findUnique({ where });
         if (!answer)
-            throw new NotFoundException(this.notFoundMessage('Answer', where));
-
-        const updatedAnswer = await this.prisma.answer.update({
-            where,
-            data,
-            select: this.selectAnswer,
-        });
-        if (!updatedAnswer)
-            throw new BadRequestException(
-                this.badRequestMessage('answer', 'updated'),
+            this.exceptionService.subjectNotFound<Prisma.AnswerWhereUniqueInput>(
+                'Answer',
+                where,
             );
 
-        return updatedAnswer;
+        try {
+            return await this.prisma.answer.update({
+                where,
+                data,
+                select: this.selectAnswer,
+            });
+        } catch (error) {
+            this.exceptionService.somethingBadHappened('answer', 'updated');
+        }
     }
 
     async deleteAnswer(where: Prisma.AnswerWhereUniqueInput): Promise<void> {
         const answer = await this.prisma.answer.findUnique({ where });
         if (!answer)
-            throw new NotFoundException(this.notFoundMessage('Answer', where));
-
-        const deletedAnswer = await this.prisma.answer.delete({ where });
-        if (!deletedAnswer)
-            throw new BadRequestException(
-                this.badRequestMessage('answer', 'deleted'),
+            this.exceptionService.subjectNotFound<Prisma.AnswerWhereUniqueInput>(
+                'Answer',
+                where,
             );
+
+        try {
+            await this.prisma.answer.delete({ where });
+        } catch (error) {
+            this.exceptionService.somethingBadHappened('answer', 'deleted');
+        }
     }
 }

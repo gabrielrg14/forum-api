@@ -1,16 +1,16 @@
-import {
-    Injectable,
-    BadRequestException,
-    NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { QuestionRepository } from './question.repository';
 import { PrismaService } from 'src/database/prisma.service';
+import { ExceptionService } from 'src/exception/exception.service';
 import { QuestionDTO, CreateQuestionDTO, UpdateQuestionDTO } from './dto';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class QuestionService implements QuestionRepository {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly exceptionService: ExceptionService,
+    ) {}
 
     private readonly selectQuestion = {
         id: true,
@@ -27,21 +27,6 @@ export class QuestionService implements QuestionRepository {
         },
     };
 
-    private readonly badRequestMessage = (
-        subject: string,
-        adjective: string,
-    ): string => {
-        return `Something bad happened and the ${subject} was not ${adjective}.`;
-    };
-    private readonly notFoundMessage = (
-        subject: string,
-        where: Prisma.QuestionWhereUniqueInput,
-    ): string => {
-        return `${subject} ${Object.entries(where)
-            .map(([key, value]) => `${key} ${value}`)
-            .join(', ')} was not found.`;
-    };
-
     async createQuestion(
         data: CreateQuestionDTO,
         userId: string,
@@ -50,20 +35,19 @@ export class QuestionService implements QuestionRepository {
             where: { id: userId },
         });
         if (!user)
-            throw new NotFoundException(
-                this.notFoundMessage('User', { id: userId }),
+            this.exceptionService.subjectNotFound<Prisma.UserWhereUniqueInput>(
+                'User',
+                { id: userId },
             );
 
-        const questionCreated = await this.prisma.question.create({
-            data: { ...data, userId },
-            select: this.selectQuestion,
-        });
-        if (!questionCreated)
-            throw new BadRequestException(
-                this.badRequestMessage('question', 'created'),
-            );
-
-        return questionCreated;
+        try {
+            return await this.prisma.question.create({
+                data: { ...data, userId },
+                select: this.selectQuestion,
+            });
+        } catch (error) {
+            this.exceptionService.somethingBadHappened('question', 'created');
+        }
     }
 
     async getQuestions(params: {
@@ -74,33 +58,36 @@ export class QuestionService implements QuestionRepository {
     }): Promise<QuestionDTO[]> {
         const { skip, take, where, orderBy } = params;
 
-        const questionsFound = await this.prisma.question.findMany({
-            skip,
-            take,
-            where,
-            orderBy,
-            select: this.selectQuestion,
-        });
-        if (!questionsFound)
-            throw new BadRequestException(
-                this.badRequestMessage('questions', 'found'),
-            );
-
-        return questionsFound;
+        try {
+            return await this.prisma.question.findMany({
+                skip,
+                take,
+                where,
+                orderBy,
+                select: this.selectQuestion,
+            });
+        } catch (error) {
+            this.exceptionService.somethingBadHappened('questions', 'found');
+        }
     }
 
     async getQuestion(
         where: Prisma.QuestionWhereUniqueInput,
     ): Promise<QuestionDTO> {
-        const questionFound = await this.prisma.question.findUnique({
-            where,
-            select: this.selectQuestion,
-        });
-        if (!questionFound)
-            throw new NotFoundException(
-                this.notFoundMessage('Question', where),
-            );
-        return questionFound;
+        try {
+            const questionFound = await this.prisma.question.findUnique({
+                where,
+                select: this.selectQuestion,
+            });
+            if (!questionFound)
+                this.exceptionService.subjectNotFound<Prisma.QuestionWhereUniqueInput>(
+                    'Question',
+                    where,
+                );
+            return questionFound;
+        } catch (error) {
+            throw error;
+        }
     }
 
     async updateQuestion(params: {
@@ -111,21 +98,20 @@ export class QuestionService implements QuestionRepository {
 
         const question = await this.prisma.question.findUnique({ where });
         if (!question)
-            throw new NotFoundException(
-                this.notFoundMessage('Question', where),
+            this.exceptionService.subjectNotFound<Prisma.QuestionWhereUniqueInput>(
+                'Question',
+                where,
             );
 
-        const updatedQuestion = await this.prisma.question.update({
-            where,
-            data,
-            select: this.selectQuestion,
-        });
-        if (!updatedQuestion)
-            throw new BadRequestException(
-                this.badRequestMessage('question', 'updated'),
-            );
-
-        return updatedQuestion;
+        try {
+            return await this.prisma.question.update({
+                where,
+                data,
+                select: this.selectQuestion,
+            });
+        } catch (error) {
+            this.exceptionService.somethingBadHappened('question', 'updated');
+        }
     }
 
     async deleteQuestion(
@@ -133,14 +119,15 @@ export class QuestionService implements QuestionRepository {
     ): Promise<void> {
         const question = await this.prisma.question.findUnique({ where });
         if (!question)
-            throw new NotFoundException(
-                this.notFoundMessage('Question', where),
+            this.exceptionService.subjectNotFound<Prisma.QuestionWhereUniqueInput>(
+                'Question',
+                where,
             );
 
-        const deletedQuestion = await this.prisma.question.delete({ where });
-        if (!deletedQuestion)
-            throw new BadRequestException(
-                this.badRequestMessage('question', 'deleted'),
-            );
+        try {
+            await this.prisma.question.delete({ where });
+        } catch (error) {
+            this.exceptionService.somethingBadHappened('question', 'deleted');
+        }
     }
 }

@@ -32,14 +32,14 @@ Authorization: Bearer {{$dotenv AUTH_TOKEN}}
 Content-Type: application/json
 
 {
-    "name": "Test Put",
-    "email": "test@put.com"
+    "name": "User Put",
+    "email": "put@test.com"
 }
 
 ###
 
 # UPDATE USER PASSWORD BY ID
-PATCH http://localhost:3000/user/561ecd94-72e7-412d-82ee-c87873391c64/password
+PATCH http://localhost:3000/user/c3f3d19c-53fe-4968-b00c-11434d21c71c/password
 Authorization: Bearer {{$dotenv AUTH_TOKEN}}
 Content-Type: application/json
 
