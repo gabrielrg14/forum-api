@@ -4,6 +4,7 @@ import { PrismaService } from 'src/database/prisma.service';
 import { ExceptionService } from 'src/exception/exception.service';
 import {
     UserDTO,
+    UserPasswordDTO,
     CreateUserDTO,
     UpdateUserDTO,
     UpdateUserPasswordDTO,
@@ -19,7 +20,7 @@ export class UserService implements UserRepository {
     ) {}
 
     private readonly hashSalt = 10;
-    private readonly userSelect = {
+    public readonly selectUser = {
         id: true,
         email: true,
         name: true,
@@ -30,7 +31,7 @@ export class UserService implements UserRepository {
     async createUser(data: CreateUserDTO): Promise<UserDTO> {
         const { email, password, passwordConfirmation } = data;
 
-        const user = await this.prisma.user.findUnique({ where: { email } });
+        const user = await this.getFirstUser({ email });
         if (user) this.exceptionService.emailConflict(email);
 
         if (password !== passwordConfirmation)
@@ -42,7 +43,7 @@ export class UserService implements UserRepository {
         try {
             return await this.prisma.user.create({
                 data: { ...data, password: passwordHash },
-                select: this.userSelect,
+                select: this.selectUser,
             });
         } catch (error) {
             this.exceptionService.somethingBadHappened('user', 'created');
@@ -63,18 +64,18 @@ export class UserService implements UserRepository {
                 take,
                 where,
                 orderBy,
-                select: this.userSelect,
+                select: this.selectUser,
             });
         } catch (error) {
             this.exceptionService.somethingBadHappened('users', 'found');
         }
     }
 
-    async getUser(where: Prisma.UserWhereUniqueInput): Promise<UserDTO> {
+    async getUniqueUser(where: Prisma.UserWhereUniqueInput): Promise<UserDTO> {
         try {
             const userFound = await this.prisma.user.findUnique({
                 where,
-                select: this.userSelect,
+                select: this.selectUser,
             });
             if (!userFound)
                 this.exceptionService.subjectNotFound<Prisma.UserWhereUniqueInput>(
@@ -87,23 +88,35 @@ export class UserService implements UserRepository {
         }
     }
 
+    async getFirstUser(where: Prisma.UserWhereInput): Promise<UserDTO> {
+        return await this.prisma.user.findFirst({
+            where,
+            select: this.selectUser,
+        });
+    }
+
+    async getUserPassword(
+        where: Prisma.UserWhereUniqueInput,
+    ): Promise<UserPasswordDTO> {
+        return await this.prisma.user.findUnique({
+            where,
+            select: {
+                id: true,
+                password: true,
+            },
+        });
+    }
+
     async updateUser(params: {
         where: Prisma.UserWhereUniqueInput;
         data: UpdateUserDTO;
     }): Promise<UserDTO> {
         const { where, data } = params;
 
-        const user = await this.prisma.user.findUnique({ where });
-        if (!user)
-            this.exceptionService.subjectNotFound<Prisma.UserWhereUniqueInput>(
-                'User',
-                where,
-            );
+        const user = await this.getUniqueUser(where);
 
         if (data.email) {
-            const userEmail = await this.prisma.user.findUnique({
-                where: { email: data.email },
-            });
+            const userEmail = await this.getFirstUser({ email: data.email });
             if (userEmail && userEmail.id !== user.id)
                 this.exceptionService.emailConflict(data.email);
         }
@@ -112,7 +125,7 @@ export class UserService implements UserRepository {
             return await this.prisma.user.update({
                 where,
                 data,
-                select: this.userSelect,
+                select: this.selectUser,
             });
         } catch (error) {
             this.exceptionService.somethingBadHappened('user', 'updated');
@@ -128,7 +141,7 @@ export class UserService implements UserRepository {
         if (data.password !== data.passwordConfirmation)
             this.exceptionService.passwordConfirmationNotMatch();
 
-        const user = await this.prisma.user.findUnique({ where });
+        const user = await this.getUserPassword(where);
         if (!user)
             this.exceptionService.subjectNotFound<Prisma.UserWhereUniqueInput>(
                 'User',
@@ -145,10 +158,9 @@ export class UserService implements UserRepository {
         );
 
         try {
-            return await this.prisma.user.update({
+            return await this.updateUser({
                 where,
                 data: { password: passwordHash },
-                select: this.userSelect,
             });
         } catch (error) {
             this.exceptionService.somethingBadHappened('password', 'changed');
@@ -156,12 +168,7 @@ export class UserService implements UserRepository {
     }
 
     async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<void> {
-        const user = await this.prisma.user.findUnique({ where });
-        if (!user)
-            this.exceptionService.subjectNotFound<Prisma.UserWhereUniqueInput>(
-                'User',
-                where,
-            );
+        await this.getUniqueUser(where);
 
         try {
             await this.prisma.user.delete({ where });

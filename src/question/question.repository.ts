@@ -14,8 +14,12 @@ export abstract class QuestionRepository {
         orderBy?: Prisma.QuestionOrderByWithRelationInput;
     }): Promise<QuestionDTO[]>;
 
-    abstract getQuestion(
+    abstract getUniqueQuestion(
         where: Prisma.QuestionWhereUniqueInput,
+    ): Promise<QuestionDTO>;
+
+    abstract getFirstQuestion(
+        where: Prisma.QuestionWhereInput,
     ): Promise<QuestionDTO>;
 
     abstract updateQuestion(params: {

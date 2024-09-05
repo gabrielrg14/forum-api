@@ -72,7 +72,7 @@ export class QuestionController {
     getQuestionById(
         @Param('uuid', ParseUUIDPipe) questionId: string,
     ): Promise<QuestionDTO> {
-        return this.questionService.getQuestion({ id: questionId });
+        return this.questionService.getUniqueQuestion({ id: questionId });
     }
 
     @Put('/:uuid')

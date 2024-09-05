@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthRepository } from './auth.repository';
-import { PrismaService } from 'src/database/prisma.service';
+import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { AuthDTO, AuthTokenDTO } from './dto';
 import * as bcrypt from 'bcrypt';
@@ -8,23 +8,22 @@ import * as bcrypt from 'bcrypt';
 @Injectable()
 export class AuthService implements AuthRepository {
     constructor(
-        private readonly prisma: PrismaService,
+        private readonly userService: UserService,
         private readonly jwtService: JwtService,
     ) {}
 
-    private readonly unauthorizedMessage = 'Invalid credentials.';
+    private readonly invalidCredentialsMessage = 'Invalid credentials.';
 
     async authUser(authData: AuthDTO): Promise<AuthTokenDTO> {
         const { email, password } = authData;
 
-        const user = await this.prisma.user.findUnique({
-            where: { email },
-        });
-        if (!user) throw new UnauthorizedException(this.unauthorizedMessage);
+        const user = await this.userService.getUserPassword({ email });
+        if (!user)
+            throw new UnauthorizedException(this.invalidCredentialsMessage);
 
         const passwordMatch = await bcrypt.compareSync(password, user.password);
         if (!passwordMatch)
-            throw new UnauthorizedException(this.unauthorizedMessage);
+            throw new UnauthorizedException(this.invalidCredentialsMessage);
 
         const payload = { sub: user.id };
         return {

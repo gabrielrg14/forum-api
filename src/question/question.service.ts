@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { QuestionRepository } from './question.repository';
 import { PrismaService } from 'src/database/prisma.service';
 import { ExceptionService } from 'src/exception/exception.service';
+import { UserService } from 'src/user/user.service';
 import { QuestionDTO, CreateQuestionDTO, UpdateQuestionDTO } from './dto';
 import { Prisma } from '@prisma/client';
 
@@ -10,20 +11,17 @@ export class QuestionService implements QuestionRepository {
     constructor(
         private readonly prisma: PrismaService,
         private readonly exceptionService: ExceptionService,
+        private readonly userService: UserService,
     ) {}
 
-    private readonly selectQuestion = {
+    public readonly selectQuestion = {
         id: true,
         title: true,
         body: true,
         createdAt: true,
         updatedAt: true,
         user: {
-            select: {
-                id: true,
-                email: true,
-                name: true,
-            },
+            select: this.userService.selectUser,
         },
     };
 
@@ -31,14 +29,7 @@ export class QuestionService implements QuestionRepository {
         data: CreateQuestionDTO,
         userId: string,
     ): Promise<QuestionDTO> {
-        const user = await this.prisma.user.findUnique({
-            where: { id: userId },
-        });
-        if (!user)
-            this.exceptionService.subjectNotFound<Prisma.UserWhereUniqueInput>(
-                'User',
-                { id: userId },
-            );
+        await this.userService.getUniqueUser({ id: userId });
 
         try {
             return await this.prisma.question.create({
@@ -71,7 +62,7 @@ export class QuestionService implements QuestionRepository {
         }
     }
 
-    async getQuestion(
+    async getUniqueQuestion(
         where: Prisma.QuestionWhereUniqueInput,
     ): Promise<QuestionDTO> {
         try {
@@ -90,18 +81,22 @@ export class QuestionService implements QuestionRepository {
         }
     }
 
+    async getFirstQuestion(
+        where: Prisma.QuestionWhereInput,
+    ): Promise<QuestionDTO> {
+        return await this.prisma.question.findFirst({
+            where,
+            select: this.selectQuestion,
+        });
+    }
+
     async updateQuestion(params: {
         where: Prisma.QuestionWhereUniqueInput;
         data: UpdateQuestionDTO;
     }): Promise<QuestionDTO> {
         const { where, data } = params;
 
-        const question = await this.prisma.question.findUnique({ where });
-        if (!question)
-            this.exceptionService.subjectNotFound<Prisma.QuestionWhereUniqueInput>(
-                'Question',
-                where,
-            );
+        await this.getUniqueQuestion(where);
 
         try {
             return await this.prisma.question.update({
@@ -117,12 +112,7 @@ export class QuestionService implements QuestionRepository {
     async deleteQuestion(
         where: Prisma.QuestionWhereUniqueInput,
     ): Promise<void> {
-        const question = await this.prisma.question.findUnique({ where });
-        if (!question)
-            this.exceptionService.subjectNotFound<Prisma.QuestionWhereUniqueInput>(
-                'Question',
-                where,
-            );
+        await this.getUniqueQuestion(where);
 
         try {
             await this.prisma.question.delete({ where });

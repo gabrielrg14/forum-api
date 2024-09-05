@@ -76,7 +76,7 @@ export class AnswerController {
     getAnswerById(
         @Param('uuid', ParseUUIDPipe) answerId: string,
     ): Promise<AnswerDTO> {
-        return this.answerService.getAnswer({ id: answerId });
+        return this.answerService.getUniqueAnswer({ id: answerId });
     }
 
     @Put('/:uuid')

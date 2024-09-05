@@ -64,7 +64,7 @@ export class UserController {
     getUserById(
         @Param('uuid', ParseUUIDPipe) userId: string,
     ): Promise<UserDTO> {
-        return this.userService.getUser({ id: userId });
+        return this.userService.getUniqueUser({ id: userId });
     }
 
     @Put('/:uuid')

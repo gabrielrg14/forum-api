@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { AnswerRepository } from './answer.repository';
 import { PrismaService } from 'src/database/prisma.service';
 import { ExceptionService } from 'src/exception/exception.service';
+import { UserService } from 'src/user/user.service';
+import { QuestionService } from 'src/question/question.service';
 import { AnswerDTO, CreateAnswerDTO, UpdateAnswerDTO } from './dto';
 import { Prisma } from '@prisma/client';
 
@@ -10,28 +12,21 @@ export class AnswerService implements AnswerRepository {
     constructor(
         private readonly prisma: PrismaService,
         private readonly exceptionService: ExceptionService,
+        private readonly userService: UserService,
+        private readonly questionService: QuestionService,
     ) {}
 
-    private readonly userSelect = {
-        id: true,
-        email: true,
-        name: true,
-    };
-
-    private readonly questionSelect = {
-        id: true,
-        title: true,
-        body: true,
-        user: { select: this.userSelect },
-    };
-
-    private readonly selectAnswer = {
+    public readonly selectAnswer = {
         id: true,
         body: true,
         createdAt: true,
         updatedAt: true,
-        user: { select: this.userSelect },
-        question: { select: this.questionSelect },
+        user: {
+            select: this.userService.selectUser,
+        },
+        question: {
+            select: this.questionService.selectQuestion,
+        },
     };
 
     async createAnswer(
@@ -39,23 +34,8 @@ export class AnswerService implements AnswerRepository {
         userId: string,
         questionId: string,
     ): Promise<AnswerDTO> {
-        const user = await this.prisma.user.findUnique({
-            where: { id: userId },
-        });
-        if (!user)
-            this.exceptionService.subjectNotFound<Prisma.UserWhereUniqueInput>(
-                'User',
-                { id: userId },
-            );
-
-        const question = await this.prisma.question.findUnique({
-            where: { id: questionId },
-        });
-        if (!question)
-            this.exceptionService.subjectNotFound<Prisma.QuestionWhereUniqueInput>(
-                'Question',
-                { id: questionId },
-            );
+        await this.userService.getUniqueUser({ id: userId });
+        await this.questionService.getUniqueQuestion({ id: questionId });
 
         try {
             return await this.prisma.answer.create({
@@ -88,7 +68,9 @@ export class AnswerService implements AnswerRepository {
         }
     }
 
-    async getAnswer(where: Prisma.AnswerWhereUniqueInput): Promise<AnswerDTO> {
+    async getUniqueAnswer(
+        where: Prisma.AnswerWhereUniqueInput,
+    ): Promise<AnswerDTO> {
         try {
             const answerFound = await this.prisma.answer.findUnique({
                 where,
@@ -105,18 +87,20 @@ export class AnswerService implements AnswerRepository {
         }
     }
 
+    async getFirstAnswer(where: Prisma.AnswerWhereInput): Promise<AnswerDTO> {
+        return await this.prisma.answer.findFirst({
+            where,
+            select: this.selectAnswer,
+        });
+    }
+
     async updateAnswer(params: {
         where: Prisma.AnswerWhereUniqueInput;
         data: UpdateAnswerDTO;
     }): Promise<AnswerDTO> {
         const { where, data } = params;
 
-        const answer = await this.prisma.answer.findUnique({ where });
-        if (!answer)
-            this.exceptionService.subjectNotFound<Prisma.AnswerWhereUniqueInput>(
-                'Answer',
-                where,
-            );
+        await this.getUniqueAnswer(where);
 
         try {
             return await this.prisma.answer.update({
@@ -130,12 +114,7 @@ export class AnswerService implements AnswerRepository {
     }
 
     async deleteAnswer(where: Prisma.AnswerWhereUniqueInput): Promise<void> {
-        const answer = await this.prisma.answer.findUnique({ where });
-        if (!answer)
-            this.exceptionService.subjectNotFound<Prisma.AnswerWhereUniqueInput>(
-                'Answer',
-                where,
-            );
+        await this.getUniqueAnswer(where);
 
         try {
             await this.prisma.answer.delete({ where });
