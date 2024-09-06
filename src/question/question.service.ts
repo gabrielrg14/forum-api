@@ -26,8 +26,8 @@ export class QuestionService implements QuestionRepository {
     };
 
     async createQuestion(
-        data: CreateQuestionDTO,
         userId: string,
+        data: CreateQuestionDTO,
     ): Promise<QuestionDTO> {
         await this.userService.getUniqueUser({ id: userId });
 
@@ -90,13 +90,16 @@ export class QuestionService implements QuestionRepository {
         });
     }
 
-    async updateQuestion(params: {
-        where: Prisma.QuestionWhereUniqueInput;
-        data: UpdateQuestionDTO;
-    }): Promise<QuestionDTO> {
+    async updateQuestion(
+        userId: string,
+        params: {
+            where: Prisma.QuestionWhereUniqueInput;
+            data: UpdateQuestionDTO;
+        },
+    ): Promise<QuestionDTO> {
         const { where, data } = params;
 
-        await this.getUniqueQuestion(where);
+        await this.getUniqueQuestion({ ...where, userId });
 
         try {
             return await this.prisma.question.update({
@@ -110,9 +113,10 @@ export class QuestionService implements QuestionRepository {
     }
 
     async deleteQuestion(
+        userId: string,
         where: Prisma.QuestionWhereUniqueInput,
     ): Promise<void> {
-        await this.getUniqueQuestion(where);
+        await this.getUniqueQuestion({ ...where, userId });
 
         try {
             await this.prisma.question.delete({ where });

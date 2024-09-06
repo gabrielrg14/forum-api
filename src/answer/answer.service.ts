@@ -30,9 +30,9 @@ export class AnswerService implements AnswerRepository {
     };
 
     async createAnswer(
-        data: CreateAnswerDTO,
         userId: string,
         questionId: string,
+        data: CreateAnswerDTO,
     ): Promise<AnswerDTO> {
         await this.userService.getUniqueUser({ id: userId });
         await this.questionService.getUniqueQuestion({ id: questionId });
@@ -94,13 +94,16 @@ export class AnswerService implements AnswerRepository {
         });
     }
 
-    async updateAnswer(params: {
-        where: Prisma.AnswerWhereUniqueInput;
-        data: UpdateAnswerDTO;
-    }): Promise<AnswerDTO> {
+    async updateAnswer(
+        userId: string,
+        params: {
+            where: Prisma.AnswerWhereUniqueInput;
+            data: UpdateAnswerDTO;
+        },
+    ): Promise<AnswerDTO> {
         const { where, data } = params;
 
-        await this.getUniqueAnswer(where);
+        await this.getUniqueAnswer({ ...where, userId });
 
         try {
             return await this.prisma.answer.update({
@@ -113,8 +116,11 @@ export class AnswerService implements AnswerRepository {
         }
     }
 
-    async deleteAnswer(where: Prisma.AnswerWhereUniqueInput): Promise<void> {
-        await this.getUniqueAnswer(where);
+    async deleteAnswer(
+        userId: string,
+        where: Prisma.AnswerWhereUniqueInput,
+    ): Promise<void> {
+        await this.getUniqueAnswer({ ...where, userId });
 
         try {
             await this.prisma.answer.delete({ where });

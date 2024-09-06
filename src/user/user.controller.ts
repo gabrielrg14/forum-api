@@ -3,6 +3,7 @@ import {
     UseGuards,
     ParseUUIDPipe,
     Body,
+    Request,
     Query,
     Param,
     Get,
@@ -20,6 +21,7 @@ import {
     UpdateUserDTO,
     UpdateUserPasswordDTO,
 } from './dto';
+import { RequestTokenDTO } from 'src/auth/dto';
 import { Prisma } from '@prisma/client';
 
 @Controller('user')
@@ -67,35 +69,30 @@ export class UserController {
         return this.userService.getUniqueUser({ id: userId });
     }
 
-    @Put('/:uuid')
+    @Put()
     @UseGuards(AuthGuard)
-    updateUserById(
-        @Param('uuid', ParseUUIDPipe) userId: string,
+    updateUser(
+        @Request() req: RequestTokenDTO,
         @Body() userData: UpdateUserDTO,
     ): Promise<UserDTO> {
-        return this.userService.updateUser({
-            where: { id: userId },
-            data: userData,
-        });
+        return this.userService.updateUser(req.token.sub, userData);
     }
 
-    @Patch('/:uuid/password')
+    @Patch('/password')
     @UseGuards(AuthGuard)
-    updateUserPasswordById(
-        @Param('uuid', ParseUUIDPipe) userId: string,
+    updateUserPassword(
+        @Request() req: RequestTokenDTO,
         @Body() userPasswordData: UpdateUserPasswordDTO,
     ): Promise<UserDTO> {
-        return this.userService.updateUserPassword({
-            where: { id: userId },
-            data: userPasswordData,
-        });
+        return this.userService.updateUserPassword(
+            req.token.sub,
+            userPasswordData,
+        );
     }
 
-    @Delete('/:uuid')
+    @Delete()
     @UseGuards(AuthGuard)
-    deleteUserById(
-        @Param('uuid', ParseUUIDPipe) userId: string,
-    ): Promise<void> {
-        return this.userService.deleteUser({ id: userId });
+    deleteUser(@Request() req: RequestTokenDTO): Promise<void> {
+        return this.userService.deleteUser(req.token.sub);
     }
 }

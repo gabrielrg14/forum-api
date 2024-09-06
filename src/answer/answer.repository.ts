@@ -3,9 +3,9 @@ import { Prisma } from '@prisma/client';
 
 export abstract class AnswerRepository {
     abstract createAnswer(
-        data: CreateAnswerDTO,
         userId: string,
         questionId: string,
+        data: CreateAnswerDTO,
     ): Promise<AnswerDTO>;
 
     abstract getAnswers(params: {
@@ -21,10 +21,16 @@ export abstract class AnswerRepository {
 
     abstract getFirstAnswer(where: Prisma.AnswerWhereInput): Promise<AnswerDTO>;
 
-    abstract updateAnswer(params: {
-        where: Prisma.AnswerWhereUniqueInput;
-        data: UpdateAnswerDTO;
-    }): Promise<AnswerDTO>;
+    abstract updateAnswer(
+        userId: string,
+        params: {
+            where: Prisma.AnswerWhereUniqueInput;
+            data: UpdateAnswerDTO;
+        },
+    ): Promise<AnswerDTO>;
 
-    abstract deleteAnswer(where: Prisma.AnswerWhereUniqueInput): Promise<void>;
+    abstract deleteAnswer(
+        userId: string,
+        where: Prisma.AnswerWhereUniqueInput,
+    ): Promise<void>;
 }

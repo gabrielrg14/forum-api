@@ -29,10 +29,10 @@ export class QuestionController {
     @Post()
     @UseGuards(AuthGuard)
     createQuestion(
-        @Body() questionData: CreateQuestionDTO,
         @Request() req: RequestTokenDTO,
+        @Body() questionData: CreateQuestionDTO,
     ): Promise<QuestionDTO> {
-        return this.questionService.createQuestion(questionData, req.token.sub);
+        return this.questionService.createQuestion(req.token.sub, questionData);
     }
 
     @Get()
@@ -78,10 +78,11 @@ export class QuestionController {
     @Put('/:uuid')
     @UseGuards(AuthGuard)
     updateQuestionById(
+        @Request() req: RequestTokenDTO,
         @Param('uuid', ParseUUIDPipe) questionId: string,
         @Body() questionData: UpdateQuestionDTO,
     ): Promise<QuestionDTO> {
-        return this.questionService.updateQuestion({
+        return this.questionService.updateQuestion(req.token.sub, {
             where: { id: questionId },
             data: questionData,
         });
@@ -90,8 +91,11 @@ export class QuestionController {
     @Delete('/:uuid')
     @UseGuards(AuthGuard)
     deleteQuestionById(
+        @Request() req: RequestTokenDTO,
         @Param('uuid', ParseUUIDPipe) questionId: string,
     ): Promise<void> {
-        return this.questionService.deleteQuestion({ id: questionId });
+        return this.questionService.deleteQuestion(req.token.sub, {
+            id: questionId,
+        });
     }
 }

@@ -1,10 +1,10 @@
-import { Prisma } from '@prisma/client';
 import { QuestionDTO, CreateQuestionDTO, UpdateQuestionDTO } from './dto';
+import { Prisma } from '@prisma/client';
 
 export abstract class QuestionRepository {
     abstract createQuestion(
-        data: CreateQuestionDTO,
         userId: string,
+        data: CreateQuestionDTO,
     ): Promise<QuestionDTO>;
 
     abstract getQuestions(params: {
@@ -22,12 +22,16 @@ export abstract class QuestionRepository {
         where: Prisma.QuestionWhereInput,
     ): Promise<QuestionDTO>;
 
-    abstract updateQuestion(params: {
-        where: Prisma.QuestionWhereUniqueInput;
-        data: UpdateQuestionDTO;
-    }): Promise<QuestionDTO>;
+    abstract updateQuestion(
+        userId: string,
+        params: {
+            where: Prisma.QuestionWhereUniqueInput;
+            data: UpdateQuestionDTO;
+        },
+    ): Promise<QuestionDTO>;
 
     abstract deleteQuestion(
+        userId: string,
         where: Prisma.QuestionWhereUniqueInput,
     ): Promise<void>;
 }

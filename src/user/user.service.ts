@@ -107,13 +107,8 @@ export class UserService implements UserRepository {
         });
     }
 
-    async updateUser(params: {
-        where: Prisma.UserWhereUniqueInput;
-        data: UpdateUserDTO;
-    }): Promise<UserDTO> {
-        const { where, data } = params;
-
-        const user = await this.getUniqueUser(where);
+    async updateUser(userId: string, data: UpdateUserDTO): Promise<UserDTO> {
+        const user = await this.getUniqueUser({ id: userId });
 
         if (data.email) {
             const userEmail = await this.getFirstUser({ email: data.email });
@@ -123,7 +118,7 @@ export class UserService implements UserRepository {
 
         try {
             return await this.prisma.user.update({
-                where,
+                where: { id: user.id },
                 data,
                 select: this.selectUser,
             });
@@ -132,20 +127,18 @@ export class UserService implements UserRepository {
         }
     }
 
-    async updateUserPassword(params: {
-        where: Prisma.UserWhereUniqueInput;
-        data: UpdateUserPasswordDTO;
-    }): Promise<UserDTO> {
-        const { where, data } = params;
-
+    async updateUserPassword(
+        userId: string,
+        data: UpdateUserPasswordDTO,
+    ): Promise<UserDTO> {
         if (data.password !== data.passwordConfirmation)
             this.exceptionService.passwordConfirmationNotMatch();
 
-        const user = await this.getUserPassword(where);
+        const user = await this.getUserPassword({ id: userId });
         if (!user)
             this.exceptionService.subjectNotFound<Prisma.UserWhereUniqueInput>(
                 'User',
-                where,
+                { id: userId },
             );
 
         const isMatch = bcrypt.compareSync(data.currentPassword, user.password);
@@ -158,20 +151,17 @@ export class UserService implements UserRepository {
         );
 
         try {
-            return await this.updateUser({
-                where,
-                data: { password: passwordHash },
-            });
+            return await this.updateUser(user.id, { password: passwordHash });
         } catch (error) {
             this.exceptionService.somethingBadHappened('password', 'changed');
         }
     }
 
-    async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<void> {
-        await this.getUniqueUser(where);
+    async deleteUser(userId: string): Promise<void> {
+        await this.getUniqueUser({ id: userId });
 
         try {
-            await this.prisma.user.delete({ where });
+            await this.prisma.user.delete({ where: { id: userId } });
         } catch (error) {
             this.exceptionService.somethingBadHappened('user', 'deleted');
         }

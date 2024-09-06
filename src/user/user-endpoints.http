@@ -27,7 +27,7 @@ GET http://localhost:3000/user/c3f3d19c-53fe-4968-b00c-11434d21c71c
 ###
 
 # UPDATE USER BY ID
-PUT http://localhost:3000/user/c3f3d19c-53fe-4968-b00c-11434d21c71c
+PUT http://localhost:3000/user
 Authorization: Bearer {{$dotenv AUTH_TOKEN}}
 Content-Type: application/json
 
@@ -39,7 +39,7 @@ Content-Type: application/json
 ###
 
 # UPDATE USER PASSWORD BY ID
-PATCH http://localhost:3000/user/c3f3d19c-53fe-4968-b00c-11434d21c71c/password
+PATCH http://localhost:3000/user/password
 Authorization: Bearer {{$dotenv AUTH_TOKEN}}
 Content-Type: application/json
 
@@ -52,5 +52,5 @@ Content-Type: application/json
 ###
 
 # DELETE USER BY ID
-DELETE http://localhost:3000/user/c3f3d19c-53fe-4968-b00c-11434d21c71c
+DELETE http://localhost:3000/user
 Authorization: Bearer {{$dotenv AUTH_TOKEN}}

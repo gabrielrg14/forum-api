@@ -4,8 +4,8 @@ import {
     ParseUUIDPipe,
     Body,
     Request,
-    Param,
     Query,
+    Param,
     Post,
     Get,
     Put,
@@ -29,14 +29,14 @@ export class AnswerController {
     @Post('/question/:uuid')
     @UseGuards(AuthGuard)
     createAnswer(
-        @Body() answerData: CreateAnswerDTO,
         @Request() req: RequestTokenDTO,
         @Param('uuid', ParseUUIDPipe) questionId: string,
+        @Body() answerData: CreateAnswerDTO,
     ): Promise<AnswerDTO> {
         return this.answerService.createAnswer(
-            answerData,
             req.token.sub,
             questionId,
+            answerData,
         );
     }
 
@@ -82,10 +82,11 @@ export class AnswerController {
     @Put('/:uuid')
     @UseGuards(AuthGuard)
     updateAnswerById(
+        @Request() req: RequestTokenDTO,
         @Param('uuid', ParseUUIDPipe) answerId: string,
         @Body() answerData: UpdateAnswerDTO,
     ): Promise<AnswerDTO> {
-        return this.answerService.updateAnswer({
+        return this.answerService.updateAnswer(req.token.sub, {
             where: { id: answerId },
             data: answerData,
         });
@@ -94,8 +95,9 @@ export class AnswerController {
     @Delete('/:uuid')
     @UseGuards(AuthGuard)
     deleteAnswerById(
+        @Request() req: RequestTokenDTO,
         @Param('uuid', ParseUUIDPipe) answerId: string,
     ): Promise<void> {
-        return this.answerService.deleteAnswer({ id: answerId });
+        return this.answerService.deleteAnswer(req.token.sub, { id: answerId });
     }
 }
