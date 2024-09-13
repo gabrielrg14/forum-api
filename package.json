@@ -2,7 +2,7 @@
   "name": "forum-api",
   "version": "0.0.1",
   "private": true,
-  "description": "Nest.js Forum API",
+  "description": "Nest.js Forum API with Prisma ORM and SQLite database.",
   "author": "Gabriel Rapucci Gonzalez <gabrielrapuccigonzalez14@hotmail.com> (https://gabrielrapucci.com.br)",
   "homepage": "https://github.com/gabrielrg14/forum-api",
   "repository": {
@@ -19,7 +19,7 @@
     "back-end",
     "portfolio"
   ],
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
